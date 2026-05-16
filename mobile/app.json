@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "CIRO",
+    "slug": "ciro-crisis-orchestrator",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.ciro.crisisorchestrator"
+    },
+    "android": {
+      "package": "com.ciro.crisisorchestrator"
+    }
+  }
+}
