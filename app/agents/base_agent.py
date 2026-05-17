@@ -1,7 +1,16 @@
-cat > ~/CIRO/app/agents/base_agent.py << 'EOF'
 """
 CIRO Base Agent
 Custom ADK-style agent pattern — no google-adk dependency.
+
+Every agent is a Python class with:
+  - name          : str
+  - system_prompt : str
+  - run(input)    -> dict   (must be implemented by subclasses)
+
+Shared helpers:
+  - _call_llm(user_msg) -> str        (async Gemini/Groq call with JSON mode)
+  - _parse_json(raw)    -> dict       (strips fences, parses JSON)
+  - _make_trace(...)    -> dict       (creates agent trace record)
 """
 
 import json
@@ -20,6 +29,9 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_
 
 
 class BaseAgent:
+    """
+    ADK-style base agent. Subclasses only need to implement `run()`.
+    """
 
     def __init__(self, name: str, system_prompt: str):
         self.name          = name
@@ -27,8 +39,17 @@ class BaseAgent:
         self._groq_client  = AsyncGroq(api_key=GROQ_API_KEY)
         self._gemini_model = "gemini-2.0-flash"
 
+    # ── Public interface ──────────────────────────────────────────────────────
+
     async def run(self, input_data: dict) -> dict:
+        """
+        Entry point for every agent. Must return a dict that includes:
+          - 'agent_trace': dict   (one trace record for this invocation)
+          - agent-specific keys
+        """
         raise NotImplementedError(f"{self.name}.run() not implemented")
+
+    # ── LLM helpers ───────────────────────────────────────────────────────────
 
     async def _call_llm(self, user_message: str, json_mode: bool = True):
         try:
@@ -70,14 +91,22 @@ class BaseAgent:
         }
         if json_mode:
             kwargs["response_format"] = {"type": "json_object"}
+
         t0       = time.monotonic()
         response = await self._groq_client.chat.completions.create(**kwargs)
         elapsed  = int((time.monotonic() - t0) * 1000)
+
         content = response.choices[0].message.content or ""
         logger.info("[%s] Groq done in %dms", self.name, elapsed)
         return content.strip(), elapsed
 
+    # ── JSON parsing ──────────────────────────────────────────────────────────
+
     def _parse_json(self, raw: str) -> dict:
+        """
+        Robustly parse LLM output that may contain markdown code fences.
+        Falls back to an error dict rather than raising.
+        """
         if "```" in raw:
             parts = raw.split("```")
             for part in parts:
@@ -88,13 +117,26 @@ class BaseAgent:
                     return json.loads(candidate)
                 except json.JSONDecodeError:
                     continue
+
         try:
             return json.loads(raw)
         except json.JSONDecodeError as exc:
             logger.warning("[%s] JSON parse failed: %s | raw=%s", self.name, exc, raw[:200])
             return {"parse_error": str(exc), "raw_response": raw[:500]}
 
-    def _make_trace(self, input_data: dict, output: dict, reasoning: str = "", duration_ms: int = 0) -> dict:
+    # ── Trace helpers ─────────────────────────────────────────────────────────
+
+    def _make_trace(
+        self,
+        input_data:  dict,
+        output:      dict,
+        reasoning:   str = "",
+        duration_ms: int = 0,
+    ) -> dict:
+        """
+        Build a structured trace record for this agent invocation.
+        Returned as 'agent_trace' key in every agent output.
+        """
         return {
             "trace_id":      str(uuid.uuid4()),
             "agent":         self.name,
@@ -106,11 +148,13 @@ class BaseAgent:
             "duration_ms":   duration_ms,
         }
 
+    # ── Utilities ─────────────────────────────────────────────────────────────
+
     @staticmethod
     def _safe_preview(obj, max_chars: int = 300) -> str:
+        """Convert dict to a short string preview."""
         try:
             s = json.dumps(obj, ensure_ascii=False)
             return s[:max_chars] + ("..." if len(s) > max_chars else "")
         except Exception:
             return str(obj)[:max_chars]
-EOF
