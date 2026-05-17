@@ -40,11 +40,12 @@ MAX_LOG_ENTRIES = int(os.getenv("MAX_LOG_ENTRIES", "200"))
 
 def validate_config() -> None:
     """Raise EnvironmentError if critical vars are missing."""
-    if not GROQ_API_KEY:
+    has_gemini = any(os.getenv(k) for k in ["GEMINI_API_KEY_1", "GEMINI_API_KEY_2", "GEMINI_API_KEY", "GOOGLE_API_KEY"])
+    has_groq = any(os.getenv(k) for k in ["GROQ_API_KEY_1", "GROQ_API_KEY_2", "GROQ_API_KEY"])
+    if not has_gemini and not has_groq:
         raise EnvironmentError(
-            "[CIRO] GROQ_API_KEY is not set. "
-            "Please add it to your .env file. "
-            "Get a free key at https://console.groq.com"
+            "[CIRO] No API keys configured for either Gemini or Groq. "
+            "Please add at least one LLM API key to your environment or .env file."
         )
 
 

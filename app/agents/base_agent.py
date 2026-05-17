@@ -25,7 +25,17 @@ from app.config import GROQ_API_KEY, GROQ_MODEL, GROQ_TEMPERATURE, GROQ_MAX_TOKE
 
 logger = logging.getLogger(__name__)
 
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+GEMINI_KEYS = list(filter(None, [
+    os.environ.get("GEMINI_API_KEY_1"),
+    os.environ.get("GEMINI_API_KEY_2"),
+    os.environ.get("GEMINI_API_KEY"),
+]))
+
+GROQ_KEYS = list(filter(None, [
+    os.environ.get("GROQ_API_KEY_1"),
+    os.environ.get("GROQ_API_KEY_2"),
+    os.environ.get("GROQ_API_KEY"),
+]))
 
 
 class BaseAgent:
@@ -36,7 +46,6 @@ class BaseAgent:
     def __init__(self, name: str, system_prompt: str):
         self.name          = name
         self.system_prompt = system_prompt
-        self._groq_client  = AsyncGroq(api_key=GROQ_API_KEY)
         self._gemini_model = "gemini-2.0-flash"
 
     # ── Public interface ──────────────────────────────────────────────────────
@@ -62,24 +71,44 @@ class BaseAgent:
             return await self._call_groq(user_message, json_mode)
 
     async def _call_gemini(self, user_message: str, json_mode: bool = True):
-        if not GEMINI_API_KEY:
-            raise ValueError("GEMINI_API_KEY not set")
-        t0 = time.monotonic()
-        client = genai.Client(api_key=GEMINI_API_KEY)
-        response = await client.aio.models.generate_content(
-            model=self._gemini_model,
-            contents=self.system_prompt + "\n\n" + user_message,
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json" if json_mode else "text/plain",
-                temperature=GROQ_TEMPERATURE,
-            ),
-        )
-        elapsed = int((time.monotonic() - t0) * 1000)
-        content = response.text or ""
-        logger.info("[%s] Gemini done in %dms", self.name, elapsed)
-        return content.strip(), elapsed
+        if not GEMINI_KEYS:
+            raise ValueError("No GEMINI_KEYS configured")
+
+        last_error = None
+        for i, key in enumerate(GEMINI_KEYS):
+            try:
+                t0 = time.monotonic()
+                client = genai.Client(api_key=key)
+                response = await client.aio.models.generate_content(
+                    model=self._gemini_model,
+                    contents=self.system_prompt + "\n\n" + user_message,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json" if json_mode else "text/plain",
+                        temperature=GROQ_TEMPERATURE,
+                    ),
+                )
+                elapsed = int((time.monotonic() - t0) * 1000)
+                content = response.text or ""
+                logger.info("[%s] Gemini done using key index %d in %dms", self.name, i, elapsed)
+                return content.strip(), elapsed
+            except Exception as e:
+                err_str = str(e).lower()
+                is_rate_limit = "429" in err_str or "quota" in err_str or "exhausted" in err_str or "rate limit" in err_str
+                if is_rate_limit:
+                    logger.warning("[%s] Gemini API key index %d rate limited/exhausted: %s. Trying next key...", self.name, i, e)
+                    last_error = e
+                    continue
+                else:
+                    logger.warning("[%s] Gemini API key index %d error: %s. Trying next key...", self.name, i, e)
+                    last_error = e
+                    continue
+
+        raise RuntimeError(f"All Gemini API keys failed. Last error: {last_error}")
 
     async def _call_groq(self, user_message: str, json_mode: bool = True):
+        if not GROQ_KEYS:
+            raise ValueError("No GROQ_KEYS configured")
+
         kwargs: dict = {
             "model":       GROQ_MODEL,
             "temperature": GROQ_TEMPERATURE,
@@ -92,13 +121,29 @@ class BaseAgent:
         if json_mode:
             kwargs["response_format"] = {"type": "json_object"}
 
-        t0       = time.monotonic()
-        response = await self._groq_client.chat.completions.create(**kwargs)
-        elapsed  = int((time.monotonic() - t0) * 1000)
+        last_error = None
+        for i, key in enumerate(GROQ_KEYS):
+            try:
+                t0 = time.monotonic()
+                client = AsyncGroq(api_key=key)
+                response = await client.chat.completions.create(**kwargs)
+                elapsed  = int((time.monotonic() - t0) * 1000)
+                content = response.choices[0].message.content or ""
+                logger.info("[%s] Groq done using key index %d in %dms", self.name, i, elapsed)
+                return content.strip(), elapsed
+            except Exception as e:
+                err_str = str(e).lower()
+                is_rate_limit = "429" in err_str or "quota" in err_str or "exhausted" in err_str or "rate limit" in err_str
+                if is_rate_limit:
+                    logger.warning("[%s] Groq API key index %d rate limited: %s. Trying next key...", self.name, i, e)
+                    last_error = e
+                    continue
+                else:
+                    logger.warning("[%s] Groq API key index %d error: %s. Trying next key...", self.name, i, e)
+                    last_error = e
+                    continue
 
-        content = response.choices[0].message.content or ""
-        logger.info("[%s] Groq done in %dms", self.name, elapsed)
-        return content.strip(), elapsed
+        raise RuntimeError(f"All Groq API keys failed. Last error: {last_error}")
 
     # ── JSON parsing ──────────────────────────────────────────────────────────
 
