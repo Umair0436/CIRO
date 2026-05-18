@@ -3,27 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CIRO Command Center — Crisis Intelligence & Response Orchestrator</title>
+  <title>CIRO EOC — Crisis Intelligence & Response Orchestrator</title>
   
   <!-- Premium Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --bg-color: #060608;
-      --panel-bg: #111116;
-      --card-bg: #161622;
-      --border-color: #242436;
-      --accent-color: #F59E0B;
-      --accent-glow: rgba(245, 158, 11, 0.2);
-      --text-primary: #FFFFFF;
-      --text-secondary: #9CA3AF;
-      --green: #10B981;
-      --red: #EF4444;
-      --blue: #3B82F6;
-      --purple: #8B5CF6;
+      --bg-color: #0a0a0f;
+      --panel-bg: #101018;
+      --card-bg: #141420;
+      --border-color: #1e1e2d;
+      --accent-color: #ff6b35;
+      --accent-glow: rgba(255, 107, 53, 0.25);
+      --text-primary: #f0f0f5;
+      --text-secondary: #8e8e9f;
+      --green: #00ff88;
+      --red: #ff3333;
+      --blue: #00bfff;
+      --purple: #bf55ec;
+      --alert-glow: rgba(255, 51, 51, 0.2);
     }
 
     * {
@@ -34,83 +35,110 @@
 
     body {
       background-color: var(--bg-color);
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+      background-size: 30px 30px;
       color: var(--text-primary);
-      font-family: 'Outfit', sans-serif;
+      font-family: 'Inter', sans-serif;
       overflow-x: hidden;
       line-height: 1.5;
     }
 
-    /* Custom Scrollbar */
+    /* Scrollbars */
     ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
     }
     ::-webkit-scrollbar-track {
       background: var(--bg-color);
     }
     ::-webkit-scrollbar-thumb {
       background: var(--border-color);
-      border-radius: 4px;
+      border-radius: 3px;
     }
     ::-webkit-scrollbar-thumb:hover {
       background: var(--accent-color);
     }
 
-    header {
+    /* Navbar styling */
+    nav {
       background-color: var(--panel-bg);
       border-bottom: 1px solid var(--border-color);
-      padding: 16px 24px;
+      padding: 12px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     }
 
-    .header-logo {
+    .nav-brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
-    .logo-badge {
-      background: linear-gradient(135deg, var(--accent-color), #D97706);
-      color: #000;
+    .brand-logo {
+      background: linear-gradient(135deg, var(--accent-color), #e0531c);
+      color: #0a0a0f;
       font-weight: 800;
-      font-size: 1.2rem;
-      width: 42px;
-      height: 42px;
+      font-size: 1.4rem;
+      width: 44px;
+      height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 8px;
+      border-radius: 6px;
       box-shadow: 0 0 15px var(--accent-glow);
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
     }
 
-    .header-logo h1 {
-      font-size: 1.4rem;
+    .brand-text h1 {
+      font-size: 1.25rem;
       font-weight: 800;
-      letter-spacing: 1px;
+      letter-spacing: 2px;
+      color: #ffffff;
+      font-family: 'Share Tech Mono', monospace;
     }
 
-    .system-status {
+    .brand-text span {
+      font-size: 0.65rem;
+      color: var(--accent-color);
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      display: block;
+      margin-top: -2px;
+    }
+
+    .nav-status {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 24px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+    }
+
+    .nav-clock {
+      color: var(--text-secondary);
+      border-left: 1px solid var(--border-color);
+      padding-left: 24px;
+      font-size: 0.9rem;
     }
 
     .status-pill {
-      background-color: rgba(16, 185, 129, 0.1);
+      background-color: rgba(0, 255, 136, 0.08);
       border: 1px solid var(--green);
       color: var(--green);
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.8rem;
+      padding: 6px 14px;
+      border-radius: 4px;
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      letter-spacing: 0.5px;
     }
 
     .status-pill span {
@@ -120,101 +148,103 @@
       border-radius: 50%;
       display: inline-block;
       animation: pulse 1.5s infinite;
+      box-shadow: 0 0 8px var(--green);
     }
 
-    .main-container {
-      max-width: 1400px;
-      margin: 32px auto;
-      padding: 0 24px;
+    /* Main Grid System */
+    .dashboard-grid {
       display: grid;
-      grid-template-columns: 350px 1fr;
-      gap: 32px;
+      grid-template-columns: 380px 1fr;
+      gap: 24px;
+      padding: 24px 32px;
+      max-width: 1920px;
+      margin: 0 auto;
     }
 
-    @media (max-width: 1024px) {
-      .main-container {
+    @media (max-width: 1200px) {
+      .dashboard-grid {
         grid-template-columns: 1fr;
       }
     }
 
-    .control-panel {
-      background-color: var(--panel-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 24px;
-      height: fit-content;
-      position: sticky;
-      top: 100px;
+    /* Left Sidebar */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
     }
 
-    .section-title {
-      font-size: 0.9rem;
+    .sidebar-card {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    .sidebar-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.95rem;
       color: var(--accent-color);
-      font-weight: 800;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1.5px;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
+      border-bottom: 1px dashed var(--border-color);
+      padding-bottom: 10px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      color: var(--text-secondary);
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
     textarea {
       width: 100%;
-      background-color: var(--bg-color);
+      background-color: #07070a;
       border: 1px solid var(--border-color);
-      border-radius: 8px;
+      border-radius: 6px;
       color: var(--text-primary);
-      padding: 12px;
+      padding: 16px;
       font-family: inherit;
       font-size: 0.9rem;
-      resize: vertical;
-      min-height: 120px;
+      resize: none;
+      height: 140px;
       transition: all 0.3s ease;
+      line-height: 1.4;
     }
 
     textarea:focus {
       outline: none;
       border-color: var(--accent-color);
-      box-shadow: 0 0 10px var(--accent-glow);
+      box-shadow: 0 0 12px var(--accent-glow);
     }
 
     button {
       width: 100%;
       padding: 14px;
-      border-radius: 8px;
+      border-radius: 6px;
       font-weight: 700;
       cursor: pointer;
-      transition: all 0.3s ease;
-      font-size: 0.9rem;
+      transition: all 0.25s ease;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
+      font-family: 'Share Tech Mono', monospace;
     }
 
-    .btn-primary {
-      background: linear-gradient(135deg, #EF4444, #DC2626);
+    .btn-analyze {
+      background: linear-gradient(135deg, var(--red), #cc1111);
       color: #FFF;
       border: none;
-      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+      box-shadow: 0 4px 15px rgba(255, 51, 51, 0.3);
+      margin-top: 16px;
     }
 
-    .btn-primary:hover {
+    .btn-analyze:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+      box-shadow: 0 6px 20px rgba(255, 51, 51, 0.5);
     }
 
     .btn-demo {
@@ -229,158 +259,261 @@
       transform: translateY(-2px);
     }
 
-    .display-panel {
+    /* Real-Time Live Feed Card */
+    .feed-list {
       display: flex;
       flex-direction: column;
-      gap: 32px;
+      gap: 14px;
     }
 
-    .placeholder-view {
+    .feed-item {
+      background-color: #07070a;
+      border-left: 2px solid var(--accent-color);
+      padding: 12px 14px;
+      border-radius: 0 4px 4px 0;
+      font-size: 0.8rem;
+    }
+
+    .feed-meta {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-secondary);
+      font-family: 'Share Tech Mono', monospace;
+      margin-bottom: 4px;
+    }
+
+    .feed-text {
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+
+    /* Right workspace */
+    .workspace {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Placeholder status styling */
+    .hud-placeholder {
       background-color: var(--panel-bg);
       border: 1px dashed var(--border-color);
-      border-radius: 12px;
-      padding: 60px 24px;
+      border-radius: 8px;
+      padding: 120px 48px;
       text-align: center;
       color: var(--text-secondary);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 16px;
+      gap: 20px;
     }
 
-    .placeholder-icon {
-      font-size: 3rem;
-      opacity: 0.5;
+    .hud-placeholder-icon {
+      font-size: 4rem;
+      animation: pulse-slow 2.5s infinite;
+      opacity: 0.7;
     }
 
-    /* Loading Overlay */
-    .loading-overlay {
-      background-color: rgba(6, 6, 8, 0.95);
+    /* Loading state box */
+    .hud-loading {
+      background-color: var(--panel-bg);
       border: 1px solid var(--accent-color);
-      border-radius: 12px;
-      padding: 60px 24px;
+      border-radius: 8px;
+      padding: 80px 48px;
       text-align: center;
       display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 20px;
+      gap: 32px;
       box-shadow: 0 0 30px var(--accent-glow);
     }
 
-    .spinner {
-      width: 50px;
-      height: 50px;
-      border: 3px solid rgba(245, 158, 11, 0.1);
-      border-top: 3px solid var(--accent-color);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
+    .hud-loading-spinner {
+      position: relative;
+      width: 70px;
+      height: 70px;
     }
 
-    .loading-status-box {
+    .hud-loading-spinner .circle-inner {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 4px solid rgba(255, 107, 53, 0.1);
+      border-top-color: var(--accent-color);
+      border-radius: 50%;
+      animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    }
+
+    .hud-loading-spinner .circle-outer {
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      width: 90px;
+      height: 90px;
+      border: 2px dashed rgba(255, 107, 53, 0.2);
+      border-radius: 50%;
+      animation: spin-reverse 8s linear infinite;
+    }
+
+    .loading-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.95rem;
+      color: var(--accent-color);
+    }
+
+    /* Red Alert Banner */
+    .alert-banner {
+      background: linear-gradient(90deg, rgba(255, 51, 51, 0.15) 0%, rgba(16, 16, 24, 0) 100%);
+      border: 1px solid var(--red);
+      border-left: 5px solid var(--red);
+      border-radius: 8px;
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 0 20px var(--alert-glow);
+    }
+
+    .alert-banner-info {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .alert-banner-badge {
+      background-color: var(--red);
+      color: #fff;
+      font-family: 'Share Tech Mono', monospace;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 1rem;
+      letter-spacing: 1px;
+    }
+
+    .alert-banner-msg {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .alert-banner-msg span {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .alert-banner-stats {
+      display: flex;
+      gap: 32px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem;
+    }
+
+    .alert-stat {
+      text-align: right;
+    }
+
+    .alert-stat-val {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--red);
+    }
+
+    .alert-stat-lbl {
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+    }
+
+    /* Workspace Content Panels */
+    .workspace-section {
+      display: none;
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    .workspace-card {
       background-color: var(--panel-bg);
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      padding: 12px 24px;
-      min-width: 250px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
     }
 
-    .loading-status-text {
-      color: var(--accent-color);
+    .workspace-card-title {
       font-family: 'Share Tech Mono', monospace;
-      font-size: 1.1rem;
-      letter-spacing: 1px;
-    }
-
-    /* Result Components */
-    .result-section {
-      display: none;
-      animation: fadeIn 0.5s ease-out forwards;
-    }
-
-    .overview-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-      margin-bottom: 32px;
-    }
-
-    .metric-card {
-      background-color: var(--panel-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 20px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .metric-card::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      height: 100%;
-      width: 4px;
-      background-color: var(--accent-color);
-    }
-
-    .metric-card.flood::before { background-color: var(--red); }
-    .metric-card.heatwave::before { background-color: var(--accent-color); }
-    .metric-card.accident::before { background-color: var(--blue); }
-    .metric-card.infrastructure::before { background-color: var(--purple); }
-
-    .metric-label {
-      color: var(--text-secondary);
-      font-size: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--accent-color);
       font-weight: 700;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 6px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
-    .metric-value {
-      font-size: 1.5rem;
-      font-weight: 800;
-    }
-
-    .metric-sub {
-      color: var(--text-secondary);
+    .card-title-meta {
       font-size: 0.8rem;
-      margin-top: 4px;
+      color: var(--text-secondary);
     }
 
-    /* Two Column Layout for details */
-    .details-grid {
+    /* Split Details Grid */
+    .split-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 32px;
-      margin-bottom: 32px;
+      grid-template-columns: 45% 1fr;
+      gap: 24px;
     }
 
-    @media (max-width: 900px) {
-      .details-grid {
+    @media (max-width: 1000px) {
+      .split-grid {
         grid-template-columns: 1fr;
       }
     }
 
-    .panel-box {
-      background-color: var(--panel-bg);
+    .map-box {
       border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 24px;
+      border-radius: 6px;
+      overflow: hidden;
+      height: 300px;
+      background-color: #07070a;
     }
 
-    /* Timeline style */
+    .threats-list {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .threat-tag {
+      background-color: rgba(255, 51, 51, 0.05);
+      border: 1px solid rgba(255, 51, 51, 0.15);
+      border-left: 3px solid var(--red);
+      padding: 8px 12px;
+      border-radius: 0 4px 4px 0;
+      font-size: 0.85rem;
+    }
+
+    /* Agent Timeline */
     .timeline {
       border-left: 2px solid var(--border-color);
       padding-left: 20px;
-      margin-left: 8px;
+      margin-left: 10px;
     }
 
     .timeline-item {
       position: relative;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .timeline-item:last-child {
@@ -395,168 +528,230 @@
       height: 10px;
       border-radius: 50%;
       background-color: var(--accent-color);
-      border: 2px solid var(--bg-color);
+      border: 2px solid var(--panel-bg);
       box-shadow: 0 0 10px var(--accent-glow);
     }
 
     .timeline-card {
       background-color: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 14px 16px;
-      border-left-width: 3px;
+      border-radius: 6px;
+      padding: 12px 16px;
     }
 
-    .agent-header {
+    .agent-meta {
       display: flex;
       justify-content: space-between;
-      align-items: center;
       margin-bottom: 6px;
     }
 
     .agent-name {
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
     }
 
     .agent-duration {
       font-family: 'Share Tech Mono', monospace;
       font-size: 0.8rem;
-      background-color: rgba(255, 255, 255, 0.05);
-      padding: 2px 6px;
-      border-radius: 4px;
     }
 
-    .agent-reasoning {
+    .agent-desc {
       color: var(--text-secondary);
       font-size: 0.85rem;
       font-style: italic;
+      line-height: 1.4;
+    }
+
+    /* Before / After comparative cards */
+    .comparative-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .comparative-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .state-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 20px;
+      border-top-width: 4px;
+    }
+
+    .state-card.before { border-top-color: var(--red); }
+    .state-card.after { border-top-color: var(--green); }
+
+    .state-header {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .state-summary {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    .metric-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .metric-item {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
+      font-size: 0.85rem;
+    }
+
+    .metric-name {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .metric-val {
+      font-weight: 700;
     }
 
     /* Action Plan Grid */
     .action-grid {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
     }
 
     .action-card {
       background-color: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 16px;
+      border-radius: 6px;
+      padding: 20px;
     }
 
-    .action-card h4 {
+    .action-card-header {
       font-size: 0.9rem;
       color: var(--accent-color);
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
 
-    .action-list {
+    .action-card-list {
       list-style-type: none;
     }
 
-    .action-list li {
-      color: var(--text-primary);
+    .action-card-list li {
       font-size: 0.85rem;
-      margin-bottom: 6px;
+      color: var(--text-primary);
+      margin-bottom: 8px;
       padding-left: 14px;
       position: relative;
+      line-height: 1.4;
     }
 
-    .action-list li::before {
+    .action-card-list li::before {
       content: '⚡';
       position: absolute;
       left: 0;
       top: 0;
       font-size: 0.75rem;
+      color: var(--accent-color);
     }
 
-    .alert-msg {
-      background-color: rgba(245, 158, 11, 0.05);
-      border: 1px solid rgba(245, 158, 11, 0.2);
-      border-radius: 6px;
-      padding: 10px;
-      color: #FBBF24;
+    .action-card-text {
+      background-color: rgba(255, 107, 53, 0.04);
+      border: 1px solid rgba(255, 107, 53, 0.15);
+      padding: 12px;
+      border-radius: 4px;
       font-size: 0.85rem;
-      margin-top: 6px;
-      line-height: 1.4;
+      line-height: 1.45;
+      color: #ffd0b3;
     }
 
-    /* Simulation Table */
-    .sim-banner {
+    /* Tabular details */
+    .tabular-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 1200px) {
+      .tabular-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .tabular-box {
       background-color: var(--card-bg);
-      border: 1px solid var(--accent-color);
-      border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 20px;
-      display: flex;
-      gap: 12px;
-      align-items: center;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 20px;
     }
 
-    .sim-banner-icon {
-      font-size: 1.8rem;
-    }
-
-    .sim-banner-title {
-      font-weight: 700;
-      font-size: 0.95rem;
-      color: var(--text-primary);
-      margin-bottom: 2px;
-    }
-
-    .sim-banner-desc {
-      color: var(--text-secondary);
+    .tabular-title {
+      font-family: 'Share Tech Mono', monospace;
       font-size: 0.85rem;
+      color: var(--accent-color);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
     }
 
-    .comparison-table {
+    .data-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 16px;
     }
 
-    .comparison-table th {
+    .data-table th {
       text-align: left;
-      color: var(--text-secondary);
       font-size: 0.75rem;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 8px 12px;
+      color: var(--text-secondary);
+      padding: 6px 8px;
       border-bottom: 1px solid var(--border-color);
     }
 
-    .comparison-table td {
-      padding: 12px;
+    .data-table td {
+      padding: 10px 8px;
       border-bottom: 1px solid var(--border-color);
-      font-size: 0.9rem;
+      font-size: 0.8rem;
     }
 
-    .comparison-table tr:last-child td {
+    .data-table tr:last-child td {
       border-bottom: none;
     }
 
-    .metric-tag {
-      font-weight: 600;
-      color: var(--text-primary);
+    .badge {
+      font-family: 'Share Tech Mono', monospace;
+      font-weight: 700;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
     }
 
-    .val-before {
-      color: var(--red);
-      font-weight: 600;
-    }
-
-    .val-after {
-      color: var(--green);
-      font-weight: 600;
-    }
+    .badge.green { background-color: rgba(0, 255, 136, 0.1); color: var(--green); border: 1px solid var(--green); }
+    .badge.orange { background-color: rgba(255, 107, 53, 0.1); color: var(--accent-color); border: 1px solid var(--accent-color); }
+    .badge.red { background-color: rgba(255, 51, 51, 0.1); color: var(--red); border: 1px solid var(--red); }
 
     /* Animations */
     @keyframes spin {
@@ -564,168 +759,297 @@
       100% { transform: rotate(360deg); }
     }
 
+    @keyframes spin-reverse {
+      0% { transform: rotate(360deg); }
+      100% { transform: rotate(0deg); }
+    }
+
     @keyframes pulse {
-      0%, 100% { opacity: 0.6; }
+      0%, 100% { opacity: 0.4; }
       50% { opacity: 1; }
     }
 
+    @keyframes pulse-slow {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+    }
+
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(15px); }
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="header-logo">
-      <div class="logo-badge">🛡️</div>
-      <div>
-        <h1>CIRO COMMAND</h1>
-        <div style="font-size: 0.7rem; color: var(--accent-color); font-weight: 700; letter-spacing: 1px;">CRISIS INTELLIGENCE & RESPONSE ORCHESTRATOR</div>
+  <!-- TOP NAV -->
+  <nav>
+    <div class="nav-brand">
+      <div class="brand-logo">🛡️</div>
+      <div class="brand-text">
+        <h1>CIRO // OPERATIONS</h1>
+        <span>CRISIS INTELLIGENCE & RESPONSE ORCHESTRATOR</span>
       </div>
     </div>
     
-    <div class="system-status">
+    <div class="nav-status">
       <div class="status-pill">
-        <span></span> PIPELINE ACTIVE
+        <span></span> SYSTEM ONLINE
       </div>
+      <div id="live-clock" class="nav-clock">0000-00-00 00:00:00 UTC</div>
     </div>
-  </header>
+  </nav>
 
-  <div class="main-container">
+  <!-- DASHBOARD BODY -->
+  <div class="dashboard-grid">
     
-    <!-- LEFT PANEL: CONTROLS -->
-    <div class="control-panel">
-      <div class="section-title">📢 CRISIS INGESTION</div>
+    <!-- LEFT SIDEBAR -->
+    <div class="sidebar">
       
-      <div class="form-group">
-        <label for="crisis-text">CRISIS REPORT INPUT</label>
-        <textarea id="crisis-text" placeholder="Enter emergency report in English, Roman Urdu, or Hinglish... e.g. G-10 mein bohot zyada paani khara ho gaya hai aur traffic block hai."></textarea>
+      <!-- Input Card -->
+      <div class="sidebar-card">
+        <div class="sidebar-title">📡 CRISIS DATA INTAKE</div>
+        <textarea id="crisis-text" placeholder="Type or paste emergency situation report in English or Roman Urdu... e.g. G-10 markaz block hai, bohot bara accident hua hai, ambulance chahiye."></textarea>
+        <button id="btn-submit" class="btn-analyze">
+          📊 ANALYZE SIGNAL
+        </button>
+        <button id="btn-demo" class="btn-demo">
+          ⚡ RUN G-10 FLOOD DEMO
+        </button>
       </div>
 
-      <button id="btn-submit" class="btn-primary">
-        📊 ANALYZE CRISIS
-      </button>
+      <!-- Live Logs Feed -->
+      <div class="sidebar-card">
+        <div class="sidebar-title">📻 REAL-TIME PIPELINE FEED</div>
+        <div id="logs-container" class="feed-list">
+          <!-- Dynamically Polled -->
+          <div style="color: var(--text-secondary); text-align: center; font-size: 0.8rem; padding: 20px 0;">
+            Awaiting active scanning feed...
+          </div>
+        </div>
+      </div>
 
-      <button id="btn-demo" class="btn-demo">
-        ⚡ RUN DEMO SCENARIO
-      </button>
     </div>
 
-    <!-- RIGHT PANEL: DISPLAYS -->
-    <div class="display-panel">
+    <!-- RIGHT WORKSPACE -->
+    <div class="workspace">
       
-      <!-- Initial Placeholder State -->
-      <div id="placeholder-view" class="placeholder-view">
-        <div class="placeholder-icon">📡</div>
-        <h3>No System Executions Active</h3>
-        <p style="font-size: 0.9rem; max-width: 450px; margin: 0 auto;">Input a crisis report or trigger the G-10 flood demo scenario to initiate the multi-agent AI pipeline.</p>
+      <!-- Placeholder View -->
+      <div id="placeholder-view" class="hud-placeholder">
+        <div class="hud-placeholder-icon">📡</div>
+        <h2 style="font-family: 'Share Tech Mono', monospace; font-size: 1.5rem; letter-spacing: 1.5px; color: #fff;">AWAITING SIGNAL TRANSMISSION</h2>
+        <p style="font-size: 0.9rem; max-width: 500px; line-height: 1.5;">Command Console standing by. Feed in a crisis report or click the demo trigger on the sidebar to initialize the 5-Agent Multi-Agent Orchestrator.</p>
       </div>
 
-      <!-- Loading State Overlay -->
-      <div id="loading-view" class="loading-overlay">
-        <div class="spinner"></div>
-        <h3 style="letter-spacing: 1px; font-weight: 800;">CIRO ORCHESTRATOR INVOLVED</h3>
-        <div class="loading-status-box">
-          <div id="loading-status-text" class="loading-status-text">Analyzing crisis signals...</div>
+      <!-- Loading View -->
+      <div id="loading-view" class="hud-loading">
+        <div class="hud-loading-spinner">
+          <div class="circle-inner"></div>
+          <div class="circle-outer"></div>
+        </div>
+        <div class="loading-steps">
+          <div style="font-size: 1.25rem; font-weight: 800; letter-spacing: 2px; margin-bottom: 6px;">PROCESSING ORCHESTRATION</div>
+          <div id="loading-status-text">Analyzing crisis signals...</div>
         </div>
       </div>
 
-      <!-- RESULTS SECTION -->
-      <div id="result-view" class="result-section">
+      <!-- MAIN RESULTS CONTAINER -->
+      <div id="result-view" class="workspace-section">
         
-        <!-- Metrics Grid -->
-        <div class="overview-grid">
-          <div id="card-type" class="metric-card">
-            <div class="metric-label">CRISIS TYPE</div>
-            <div id="val-type" class="metric-value">FLOOD</div>
-            <div id="val-area" class="metric-sub">📍 Islamabad G-10</div>
+        <!-- ALERT BANNER -->
+        <div class="alert-banner">
+          <div class="alert-banner-info">
+            <div id="val-type" class="alert-banner-badge">FLOOD</div>
+            <div class="alert-banner-msg">
+              CRISIS DETECTION SIGNAL IDENTIFIED
+              <span id="val-area">📍 G-10, Islamabad</span>
+            </div>
           </div>
           
-          <div class="metric-card">
-            <div class="metric-label">SEVERITY / IMPACT</div>
-            <div id="val-severity" class="metric-value">HIGH (8/10)</div>
-            <div id="val-population" class="metric-sub">👥 Affected Pop: 85,000</div>
-          </div>
-
-          <div class="metric-card">
-            <div class="metric-label">TOTAL ENGINE LATENCY</div>
-            <div id="val-latency" class="metric-value">2,450ms</div>
-            <div class="metric-sub">⚡ 5/5 Agents Synced</div>
+          <div class="alert-banner-stats">
+            <div class="alert-stat">
+              <div id="val-severity" class="alert-stat-val">HIGH (8/10)</div>
+              <div class="alert-stat-lbl">SEVERITY INDEX</div>
+            </div>
+            <div class="alert-stat">
+              <div id="val-confidence" class="alert-stat-val">96%</div>
+              <div class="alert-stat-lbl">LLM CONFIDENCE</div>
+            </div>
+            <div class="alert-stat">
+              <div id="val-latency" class="alert-stat-val">2.45s</div>
+              <div class="alert-stat-lbl">PIPELINE LATENCY</div>
+            </div>
           </div>
         </div>
 
-        <div class="details-grid">
-          <!-- Column 1: Agent Trace Timeline -->
-          <div class="panel-box">
-            <div class="section-title">⚙️ SYSTEM AGENT TRACES</div>
+        <!-- 1. MAP & TIMELINE SECTION -->
+        <div class="split-grid" style="margin-top: 24px;">
+          
+          <!-- Map Box -->
+          <div class="workspace-card">
+            <div class="workspace-card-title">🗺️ GEOLOCATION & IMPACT ASSESSMENT</div>
+            <div class="map-box">
+              <iframe 
+                id="map-iframe"
+                width="100%" 
+                height="100%" 
+                frameborder="0" 
+                style="border:0;" 
+                allowfullscreen="" 
+                loading="lazy" 
+                src="https://maps.google.com/maps?q=Islamabad&t=&z=14&ie=UTF8&iwloc=&output=embed">
+              </iframe>
+            </div>
+            <div id="immediate-threats-container" class="threats-list">
+              <!-- Dynamically populated threats tags -->
+            </div>
+          </div>
+
+          <!-- Timeline Box -->
+          <div class="workspace-card">
+            <div class="workspace-card-title">⚙️ 5-AGENT SYNCHRONIZED EXECUTION TRACES</div>
             <div id="timeline-container" class="timeline">
-              <!-- Dynamically populated -->
+              <!-- Dynamically populated traces -->
             </div>
           </div>
 
-          <!-- Column 2: Action Plan & Response Coordinates -->
-          <div class="panel-box">
-            <div class="section-title">📋 COORDIANTED RESPONSE PLANS</div>
-            <div class="action-grid">
-              
-              <div class="action-card">
-                <h4>🔀 Traffic Rerouting</h4>
-                <ul id="plan-traffic" class="action-list">
-                  <!-- Dynamically populated -->
-                </ul>
-              </div>
+        </div>
 
-              <div class="action-card">
-                <h4>🚀 Active Emergency Units</h4>
-                <ul id="plan-dispatch" class="action-list">
-                  <!-- Dynamically populated -->
-                </ul>
+        <!-- 2. BEFORE/AFTER COMPARISON -->
+        <div class="workspace-card">
+          <div class="workspace-card-title">
+            📊 SYSTEM IMPACT SIMULATION FORECAST
+            <span id="sim-id" class="card-title-meta">SIM-2026-F08A</span>
+          </div>
+          <div style="font-size: 0.85rem; color: #ffebd6; background-color: rgba(255,107,53,0.05); padding: 12px 16px; border-radius: 4px; border: 1px solid rgba(255,107,53,0.15); margin-bottom: 20px; line-height: 1.45;" id="sim-summary">
+            Analysis complete. Executing action plan shows substantial mitigation metrics.
+          </div>
+          
+          <div class="comparative-grid">
+            
+            <div class="state-card before">
+              <div class="state-header">
+                🔴 Pre-Response State
+                <span id="val-before-casualty" style="color: var(--red);">HIGH RISK</span>
               </div>
-
-              <div class="action-card">
-                <h4>⚠️ Broadcast Emergency Alert</h4>
-                <div id="plan-alert" class="alert-msg">
-                  <!-- Dynamically populated -->
-                </div>
+              <div id="val-before-sit" class="state-summary">
+                Initial operational analysis identifies catastrophic blockages and critical resource gaps.
               </div>
-
-              <div class="action-card">
-                <h4>📦 Deployed Resource Inventory</h4>
-                <ul id="plan-resources" class="action-list">
-                  <!-- Dynamically populated -->
-                </ul>
+              <div id="before-metrics-list" class="metric-list">
+                <!-- Dynamically populated -->
               </div>
-
             </div>
+
+            <div class="state-card after">
+              <div class="state-header">
+                🟢 Post-Mitigation State
+                <span id="val-after-casualty" style="color: var(--green);">LOW RISK</span>
+              </div>
+              <div id="val-after-sit" class="state-summary">
+                Simulated tactical intervention achieves restoration of public road access and secures sector safety.
+              </div>
+              <div id="after-metrics-list" class="metric-list">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
           </div>
         </div>
 
-        <!-- Simulation Comparison Section -->
-        <div class="panel-box" style="margin-bottom: 32px;">
-          <div class="section-title">📊 IMPACT SIMULATION & MITIGATION METRICS</div>
+        <!-- 3. ACTIONS GRID -->
+        <div class="workspace-card">
+          <div class="workspace-card-title">📋 COORDIANTED RESPONSE PLANS</div>
           
-          <div class="sim-banner">
-            <div class="sim-banner-icon">📈</div>
-            <div>
-              <div id="sim-id" class="sim-banner-title">SIM-2026-F08A</div>
-              <div id="sim-summary" class="sim-banner-desc">Response plan executed successfully. Road passability restored from 10% to 75%.</div>
+          <div class="action-grid">
+            
+            <div class="action-card">
+              <div class="action-card-header">🔀 Traffic Diversions</div>
+              <ul id="plan-traffic" class="action-card-list">
+                <!-- Dynamically populated -->
+              </ul>
             </div>
+
+            <div class="action-card">
+              <div class="action-card-header">🚒 Active Emergency Units</div>
+              <ul id="plan-dispatch" class="action-card-list">
+                <!-- Dynamically populated -->
+              </ul>
+            </div>
+
+            <div class="action-card">
+              <div class="action-card-header">⚠️ Emergency Alert Message</div>
+              <div id="plan-alert" class="action-card-text">
+                No alerts broadcasts active.
+              </div>
+            </div>
+
+            <div class="action-card">
+              <div class="action-card-header">📦 Deployed Resource Inventory</div>
+              <ul id="plan-resources" class="action-card-list">
+                <!-- Dynamically populated -->
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 4. TABULAR SIMULATION DATA -->
+        <div class="tabular-grid">
+          
+          <!-- Emergency Tickets -->
+          <div class="tabular-box">
+            <div class="tabular-title">🎟️ Emergency Dispatch Tickets</div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Ticket</th>
+                  <th>Unit</th>
+                  <th>Location</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="sim-tickets-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
           </div>
 
-          <table class="comparison-table">
-            <thead>
-              <tr>
-                <th>Impact Metric</th>
-                <th>Pre-Response (Before)</th>
-                <th>Post-Mitigation (After)</th>
-              </tr>
-            </thead>
-            <tbody id="sim-table-body">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
+          <!-- Alert Dispatch Log -->
+          <div class="tabular-box">
+            <div class="tabular-title">📱 Alert Dispatch Log</div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Log</th>
+                  <th>Channel</th>
+                  <th>Message</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="sim-alerts-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Route Updates -->
+          <div class="tabular-box">
+            <div class="tabular-title">🚧 Tactical Route Updates</div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Update</th>
+                  <th>Action</th>
+                  <th>Road</th>
+                  <th>Alternate</th>
+                </tr>
+              </thead>
+              <tbody id="sim-routes-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+
         </div>
 
       </div>
@@ -736,6 +1060,21 @@
   <script>
     const BACKEND_URL = 'https://ciro-backend-658608522807.us-central1.run.app';
 
+    // Clock Implementation
+    function updateClock() {
+      const d = new Date();
+      const yr = d.getUTCFullYear();
+      const mo = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const dy = String(d.getUTCDate()).padStart(2, '0');
+      const hr = String(d.getUTCHours()).padStart(2, '0');
+      const min = String(d.getUTCMinutes()).padStart(2, '0');
+      const sec = String(d.getUTCSeconds()).padStart(2, '0');
+      
+      document.getElementById('live-clock').innerText = `${yr}-${mo}-${dy} ${hr}:${min}:${sec} UTC`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
     // UI Nodes
     const btnSubmit = document.getElementById('btn-submit');
     const btnDemo = document.getElementById('btn-demo');
@@ -745,6 +1084,7 @@
     const viewLoading = document.getElementById('loading-view');
     const viewResult = document.getElementById('result-view');
     const txtStatus = document.getElementById('loading-status-text');
+    const logsContainer = document.getElementById('logs-container');
 
     // Timer refs
     let loadingInterval = null;
@@ -801,18 +1141,45 @@
 
     // Render results on UI
     function renderResults(data) {
-      // 1. Basic properties
       const type = data.crisis_type || 'unknown';
       const severityStr = data.severity ? `${data.severity.toUpperCase()} (${data.severity_score || 5}/10)` : 'MEDIUM';
       
-      document.getElementById('card-type').className = `metric-card ${type}`;
-      document.getElementById('val-type').innerText = type.toUpperCase();
+      // Update Alert Banner details
+      const badgeNode = document.getElementById('val-type');
+      badgeNode.innerText = type.toUpperCase();
+      badgeNode.className = `alert-banner-badge`;
+      if (type === 'flood') badgeNode.style.backgroundColor = 'var(--red)';
+      else if (type === 'heatwave') badgeNode.style.backgroundColor = 'var(--accent-color)';
+      else if (type === 'accident' || type === 'road_blockage') badgeNode.style.backgroundColor = 'var(--blue)';
+      else badgeNode.style.backgroundColor = 'var(--purple)';
+
       document.getElementById('val-area').innerText = `📍 ${data.affected_area || 'Sector Area'}`;
       document.getElementById('val-severity').innerText = severityStr;
-      document.getElementById('val-population').innerText = `👥 Affected Pop: ${(data.affected_population || 0).toLocaleString()}`;
-      document.getElementById('val-latency').innerText = `${(data.total_elapsed_ms || 2150).toLocaleString()}ms`;
+      document.getElementById('val-confidence').innerText = `${Math.round((data.confidence_score || 0.95) * 100)}%`;
+      document.getElementById('val-latency').innerText = `${((data.total_elapsed_ms || 2150) / 1000).toFixed(2)}s`;
 
-      // 2. Timeline
+      // Update Map embed dynamically based on location
+      const mapIframe = document.getElementById('map-iframe');
+      if (data.affected_area) {
+        mapIframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(data.affected_area + ', Islamabad')}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
+      }
+
+      // Threats List
+      const threatsContainer = document.getElementById('immediate-threats-container');
+      threatsContainer.innerHTML = '';
+      const threats = data.situation_report?.impact_assessment?.immediate_threats || [];
+      if (threats.length === 0) {
+        threatsContainer.innerHTML = `<div class="threat-tag">Stable sector status. No critical immediate threats identified.</div>`;
+      } else {
+        threats.forEach(t => {
+          const div = document.createElement('div');
+          div.className = 'threat-tag';
+          div.innerText = `⚠️ Threat: ${t}`;
+          threatsContainer.appendChild(div);
+        });
+      }
+
+      // Timeline Traces
       const timelineContainer = document.getElementById('timeline-container');
       timelineContainer.innerHTML = '';
       const traces = data.agent_traces || [];
@@ -822,26 +1189,98 @@
         card.className = 'timeline-item';
         card.innerHTML = `
           <div class="timeline-dot" style="background-color: ${color}"></div>
-          <div class="timeline-card" style="border-left-color: ${color}">
-            <div class="agent-header">
-              <span class="agent-name">${trace.agent}</span>
-              <span class="agent-duration" style="color: ${color}">${trace.duration_ms}ms</span>
+          <div class="timeline-card" style="border-left: 2px solid ${color}">
+            <div class="agent-meta">
+              <span class="agent-name" style="color: ${color}">${trace.agent}</span>
+              <span class="agent-duration" style="color: var(--text-secondary)">${trace.duration_ms}ms</span>
             </div>
-            <div class="agent-reasoning">"${trace.reasoning}"</div>
+            <div class="agent-desc">"${trace.reasoning}"</div>
           </div>
         `;
         timelineContainer.appendChild(card);
       });
 
-      // 3. Action plans
+      // Simulation ID & Summary
+      const sim = data.simulation || {};
+      document.getElementById('sim-id').innerText = sim.simulation_id || 'SIM-PIPELINE';
+      document.getElementById('sim-summary').innerText = sim.improvement_summary || 'Response plans initiated.';
+
+      // Before/After comparison
+      const before = sim.before_state || {};
+      const after = sim.after_state || {};
+
+      document.getElementById('val-before-casualty').innerText = (before.casualties_risk || 'HIGH').toUpperCase();
+      document.getElementById('val-before-casualty').style.color = (before.casualties_risk === 'low' ? 'var(--green)' : 'var(--red)');
+      document.getElementById('val-before-sit').innerText = before.situation || 'Crisis active — resources blocked.';
+      
+      document.getElementById('val-after-casualty').innerText = (after.casualties_risk || 'LOW').toUpperCase();
+      document.getElementById('val-after-casualty').style.color = (after.casualties_risk === 'low' ? 'var(--green)' : 'var(--red)');
+      document.getElementById('val-after-sit').innerText = after.situation || 'Simulated tactical intervention achieves safety restoration.';
+
+      const beforeList = document.getElementById('before-metrics-list');
+      const afterList = document.getElementById('after-metrics-list');
+      beforeList.innerHTML = '';
+      afterList.innerHTML = '';
+
+      const addMetricItem = (label, beforeVal, afterVal, isPct = false) => {
+        if (beforeVal === undefined && afterVal === undefined) return;
+        
+        const bDiv = document.createElement('div');
+        bDiv.className = 'metric-item';
+        bDiv.innerHTML = `
+          <span class="metric-name">${label}</span>
+          <span class="metric-val" style="color: var(--red)">${beforeVal !== undefined ? beforeVal + (isPct ? '%' : '') : '—'}</span>
+        `;
+        beforeList.appendChild(bDiv);
+
+        const aDiv = document.createElement('div');
+        aDiv.className = 'metric-item';
+        aDiv.innerHTML = `
+          <span class="metric-name">${label}</span>
+          <span class="metric-val" style="color: var(--green)">${afterVal !== undefined ? afterVal + (isPct ? '%' : '') : '—'}</span>
+        `;
+        afterList.appendChild(aDiv);
+      };
+
+      // Populate comparative tables
+      if (type === 'flood') {
+        addMetricItem('Road Passability', before.road_passability, after.road_passability, true);
+        const bW = before.flood_water_level_cm !== undefined ? `${before.flood_water_level_cm} cm` : before.water_level;
+        const aW = after.flood_water_level_cm !== undefined ? `${after.flood_water_level_cm} cm` : after.water_level;
+        addMetricItem('Water Level', bW, aW);
+        addMetricItem('Stranded People', before.stranded_people, after.stranded_people);
+        addMetricItem('Trapped Vehicles', before.trapped_vehicles, after.trapped_vehicles);
+        addMetricItem('Power Status', before.power_status, after.power_status);
+      } else if (type === 'heatwave') {
+        addMetricItem('Temperature', before.temperature, after.temperature);
+        addMetricItem('Hospital Capacity', before.hospital_capacity, after.hospital_capacity);
+        addMetricItem('Heat Stroke Cases', before.heat_stroke_cases, after.heat_stroke_cases);
+        const bCool = before.cooling_centers !== undefined ? before.cooling_centers : before.cooling_centers_active;
+        const aCool = after.cooling_centers !== undefined ? after.cooling_centers : after.cooling_centers_active;
+        addMetricItem('Cooling Centers', bCool, aCool);
+        addMetricItem('Road Passability', before.road_passability, after.road_passability, true);
+      } else if (type === 'accident' || type === 'road_blockage') {
+        addMetricItem('Congestion Level', before.congestion_level || before.congestion_pct, after.congestion_level || after.congestion_pct);
+        addMetricItem('Blocked Roads', before.blocked_roads, after.blocked_roads);
+        addMetricItem('Average Speed', before.avg_speed, after.avg_speed);
+      } else {
+        const allKeys = new Set([...Object.keys(before), ...Object.keys(after)]);
+        allKeys.forEach(k => {
+          if (!['situation', 'casualties_risk', 'emergency_response_active'].includes(k)) {
+            const formattedLabel = k.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            addMetricItem(formattedLabel, before[k], after[k]);
+          }
+        });
+      }
+
+      // Actions Plan Lists
       const plan = data.action_plan || {};
       
-      // Traffic plan
       const trafficContainer = document.getElementById('plan-traffic');
       trafficContainer.innerHTML = '';
       const routes = plan.traffic_rerouting?.alternate_routes || [];
       if (routes.length === 0) {
-        trafficContainer.innerHTML = `<li>No active rerouting coordinate shifts necessary.</li>`;
+        trafficContainer.innerHTML = `<li>No active rerouting shifts needed.</li>`;
       } else {
         routes.forEach(r => {
           const li = document.createElement('li');
@@ -850,7 +1289,6 @@
         });
       }
 
-      // Deployed Units
       const dispatchContainer = document.getElementById('plan-dispatch');
       dispatchContainer.innerHTML = '';
       const services = plan.emergency_dispatch?.services || [];
@@ -864,11 +1302,8 @@
         });
       }
 
-      // SMS Alert
-      const alertContainer = document.getElementById('plan-alert');
-      alertContainer.innerText = plan.public_alerts?.sms_message || 'No alerts broadcasts active.';
+      document.getElementById('plan-alert').innerText = plan.public_alerts?.sms_message || 'No alerts broadcasts active.';
 
-      // Resources Deployed
       const resourcesContainer = document.getElementById('plan-resources');
       resourcesContainer.innerHTML = '';
       const alloc = plan.resource_allocation || {};
@@ -887,62 +1322,68 @@
         resourcesContainer.innerHTML = `<li>Resources held at local sector depots.</li>`;
       }
 
-      // 4. Simulation Compare
-      const sim = data.simulation || {};
-      document.getElementById('sim-id').innerText = sim.simulation_id || 'SIM-PIPELINE';
-      document.getElementById('sim-summary').innerText = sim.improvement_summary || 'Response plans initiated.';
-
-      const before = sim.before_state || {};
-      const after = sim.after_state || {};
-      
-      const tbody = document.getElementById('sim-table-body');
-      tbody.innerHTML = '';
-
-      const addRow = (label, beforeVal, afterVal, isPct = false) => {
-        if (beforeVal === undefined && afterVal === undefined) return;
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td class="metric-tag">${label}</td>
-          <td class="val-before">${beforeVal !== undefined ? beforeVal + (isPct ? '%' : '') : '—'}</td>
-          <td class="val-after">${afterVal !== undefined ? afterVal + (isPct ? '%' : '') : '—'}</td>
-        `;
-        tbody.appendChild(row);
-      };
-
-      // Add metrics depending on crisis type
-      if (type === 'flood') {
-        addRow('Road Passability', before.road_passability, after.road_passability, true);
-        const bW = before.flood_water_level_cm !== undefined ? `${before.flood_water_level_cm} cm` : before.water_level;
-        const aW = after.flood_water_level_cm !== undefined ? `${after.flood_water_level_cm} cm` : after.water_level;
-        addRow('Water Level', bW, aW);
-        addRow('Stranded People', before.stranded_people, after.stranded_people);
-        addRow('Trapped Vehicles', before.trapped_vehicles, after.trapped_vehicles);
-        addRow('Power Status', before.power_status, after.power_status);
-        addRow('Casualties Risk', before.casualties_risk, after.casualties_risk);
-      } else if (type === 'heatwave') {
-        addRow('Temperature', before.temperature, after.temperature);
-        addRow('Hospital Capacity', before.hospital_capacity, after.hospital_capacity);
-        addRow('Heat Stroke Cases', before.heat_stroke_cases, after.heat_stroke_cases);
-        const bCool = before.cooling_centers !== undefined ? before.cooling_centers : before.cooling_centers_active;
-        const aCool = after.cooling_centers !== undefined ? after.cooling_centers : after.cooling_centers_active;
-        addRow('Cooling Centers', bCool, aCool);
-        addRow('Casualties Risk', before.casualties_risk, after.casualties_risk);
-        addRow('Emergency Response', before.emergency_response_active ? 'Active' : 'Inactive', after.emergency_response_active ? 'Active' : 'Inactive');
-        addRow('Power Status', before.power_status, after.power_status);
-        addRow('Road Passability', before.road_passability, after.road_passability, true);
-      } else if (type === 'accident' || type === 'road_blockage') {
-        addRow('Congestion Level', before.congestion_level || before.congestion_pct, after.congestion_level || after.congestion_pct);
-        addRow('Blocked Roads', before.blocked_roads, after.blocked_roads);
-        addRow('Average Speed', before.avg_speed, after.avg_speed);
-        addRow('Casualties Risk', before.casualties_risk, after.casualties_risk);
+      // Tabular Mock Tickets
+      const ticketsBody = document.getElementById('sim-tickets-body');
+      ticketsBody.innerHTML = '';
+      const tickets = sim.mock_tickets || [];
+      if (tickets.length === 0) {
+        ticketsBody.innerHTML = `<tr><td colspan="4" style="color: var(--text-secondary); text-align: center;">No active dispatch tickets.</td></tr>`;
       } else {
-        // Fallback print all keys
-        const allKeys = new Set([...Object.keys(before), ...Object.keys(after)]);
-        allKeys.forEach(k => {
-          if (!['situation', 'emergency_response_active'].includes(k)) {
-            const formattedLabel = k.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-            addRow(formattedLabel, before[k], after[k]);
-          }
+        tickets.forEach(t => {
+          const row = document.createElement('tr');
+          let badgeClass = 'orange';
+          if (t.status === 'resolved') badgeClass = 'green';
+          else if (t.status === 'dispatched') badgeClass = 'red';
+          
+          row.innerHTML = `
+            <td><span style="font-family: 'Share Tech Mono', monospace; font-weight: 700; color: #fff;">${t.ticket_id}</span></td>
+            <td>${t.assigned_to}</td>
+            <td>${t.location}</td>
+            <td><span class="badge ${badgeClass}">${t.status}</span></td>
+          `;
+          ticketsBody.appendChild(row);
+        });
+      }
+
+      // Tabular Alerts
+      const alertsBody = document.getElementById('sim-alerts-body');
+      alertsBody.innerHTML = '';
+      const alerts = sim.alert_dispatch_log || [];
+      if (alerts.length === 0) {
+        alertsBody.innerHTML = `<tr><td colspan="4" style="color: var(--text-secondary); text-align: center;">No broadcast notifications.</td></tr>`;
+      } else {
+        alerts.forEach(a => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td><span style="font-family: 'Share Tech Mono', monospace; font-weight: 700; color: #fff;">${a.log_id}</span></td>
+            <td><span class="badge orange">${a.channel}</span></td>
+            <td style="font-size: 0.75rem; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${a.message}</td>
+            <td><span class="badge green">${a.status}</span></td>
+          `;
+          alertsBody.appendChild(row);
+        });
+      }
+
+      // Tabular Routes
+      const routesBody = document.getElementById('sim-routes-body');
+      routesBody.innerHTML = '';
+      const rUpdates = sim.route_updates || [];
+      if (rUpdates.length === 0) {
+        routesBody.innerHTML = `<tr><td colspan="4" style="color: var(--text-secondary); text-align: center;">No route blockages or diversions.</td></tr>`;
+      } else {
+        rUpdates.forEach(r => {
+          const row = document.createElement('tr');
+          let actionClass = 'orange';
+          if (r.action === 'open') actionClass = 'green';
+          else if (r.action === 'close') actionClass = 'red';
+          
+          row.innerHTML = `
+            <td><span style="font-family: 'Share Tech Mono', monospace; font-weight: 700; color: #fff;">${r.update_id}</span></td>
+            <td><span class="badge ${actionClass}">${r.action}</span></td>
+            <td>${r.road}</td>
+            <td>${r.alternate || '—'}</td>
+          `;
+          routesBody.appendChild(row);
         });
       }
 
@@ -1007,9 +1448,53 @@
       }
     }
 
+    // Load recent logs for side panel
+    async function pollLogs() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/logs`);
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        const logs = (data.entries || []).slice(0, 3);
+        if (logs.length === 0) return;
+
+        logsContainer.innerHTML = '';
+        logs.forEach(log => {
+          const item = document.createElement('div');
+          item.className = 'feed-item';
+          
+          let stageLabel = log.pipeline_stage ? log.pipeline_stage.replace(/_/g, ' ').toUpperCase() : 'SYSTEM';
+          let timeStr = '00:00';
+          try {
+            const dateObj = new Date(log.timestamp);
+            const hrs = String(dateObj.getHours()).padStart(2, '0');
+            const mins = String(dateObj.getMinutes()).padStart(2, '0');
+            timeStr = `${hrs}:${mins}`;
+          } catch(e) {}
+          
+          item.innerHTML = `
+            <div class="feed-meta">
+              <span style="color: var(--accent-color)">${stageLabel}</span>
+              <span>${timeStr}</span>
+            </div>
+            <div class="feed-text">
+              Active ${log.crisis_type || 'threat'} monitoring in ${log.affected_area || 'urban centers'}. Execution finished in ${log.elapsed_ms}ms.
+            </div>
+          `;
+          logsContainer.appendChild(item);
+        });
+      } catch (e) {
+        console.warn("Failed polling logs:", e);
+      }
+    }
+
     // Event Bindings
     btnSubmit.addEventListener('click', handleAnalyzeFlow);
     btnDemo.addEventListener('click', handleDemoFlow);
+
+    // Initial logs fetch & polling loop
+    pollLogs();
+    setInterval(pollLogs, 10000);
   </script>
 </body>
 </html>
