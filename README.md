@@ -16,6 +16,12 @@ CIRO is a **5-agent AI orchestration system** that:
 4. **Plans** coordinated responses: traffic rerouting, emergency dispatch, public alerts, resource allocation
 5. **Simulates** execution outcomes with before/after state comparison
 
+## 🚀 Live Deployment
+- **Backend API**: https://ciro-backend-658608522807.us-central1.run.app
+- **API Docs**: https://ciro-backend-658608522807.us-central1.run.app/docs  
+- **Web Dashboard**: https://umair0436.github.io/CIRO/web/
+- **Mobile App**: APK link coming soon
+
 ---
 
 ## Quick Start
@@ -184,7 +190,7 @@ CIRO/
 │   ├── config.py                    ← Env vars, validation
 │   │
 │   ├── agents/                      ← 5 ADK-style agents
-│   │   ├── base_agent.py            ← BaseAgent with Groq + trace
+│   │   ├── base_agent.py            ← BaseAgent with Gemini (primary) + Groq fallback + API key rotation + trace
 │   │   ├── signal_normalizer.py     ← Agent 1
 │   │   ├── crisis_detector.py       ← Agent 2
 │   │   ├── situation_analyst.py     ← Agent 3
@@ -234,6 +240,10 @@ Update `API_URL` in `mobile/App.js` if your server IP differs from `localhost`.
 
 | Variable | Required | Description |
 |---|---|---|
+| `GEMINI_API_KEY_1` | ✅ Yes | Primary Gemini key |
+| `GEMINI_API_KEY_2` | No | Rotation fallback key |
+| `GROQ_API_KEY_1` | No | Groq rotation key 1 |
+| `GROQ_API_KEY_2` | No | Groq rotation key 2 |
 | `GROQ_API_KEY` | ✅ Yes | Groq API key (free at console.groq.com) |
 | `GROQ_MODEL` | No | Default: `llama-3.3-70b-versatile` |
 | `GROQ_TEMPERATURE` | No | Default: `0.1` |
@@ -241,6 +251,25 @@ Update `API_URL` in `mobile/App.js` if your server IP differs from `localhost`.
 | `SUPABASE_URL` | No | Optional log persistence |
 | `SUPABASE_KEY` | No | Optional log persistence |
 | `LOG_LEVEL` | No | Default: `INFO` |
+
+---
+
+## 🛠️ Tech Stack
+- **Backend**: FastAPI, Python 3.14
+- **LLM**: Google Gemini 2.0 Flash (primary), Groq LLaMA (fallback)
+- **Mobile**: React Native, Expo
+- **Web**: HTML, CSS, JavaScript, Leaflet.js
+- **Deployment**: Google Cloud Run
+- **Maps**: Google Maps API
+
+---
+
+## 🤖 Google Antigravity Usage
+CIRO was built using Google Antigravity for:
+- Multi-agent workflow orchestration
+- Agent design and implementation
+- Bug fixing and optimization
+- LLM integration (Gemini 2.0 Flash)
 
 ---
 
