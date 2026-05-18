@@ -10,6 +10,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   
+  <!-- Leaflet Map CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
   <style>
     :root {
       --bg-color: #0a0a0f;
@@ -292,6 +296,16 @@
       display: flex;
       flex-direction: column;
       gap: 24px;
+      overflow-y: auto;
+      max-height: calc(100vh - 100px);
+      padding-right: 8px;
+    }
+
+    .timeline-card, .threat-tag, .action-card, .state-card, .feed-item {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      min-width: 0;
     }
 
     /* Placeholder status styling */
@@ -560,6 +574,23 @@
       font-size: 0.85rem;
       font-style: italic;
       line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .agent-desc:hover {
+      color: var(--text-primary);
+    }
+
+    .agent-desc.expanded {
+      display: block;
+      overflow: visible;
+      -webkit-line-clamp: unset;
+      color: var(--text-primary);
     }
 
     /* Before / After comparative cards */
@@ -889,16 +920,7 @@
           <div class="workspace-card">
             <div class="workspace-card-title">🗺️ GEOLOCATION & IMPACT ASSESSMENT</div>
             <div class="map-box">
-              <iframe 
-                id="map-iframe"
-                width="100%" 
-                height="100%" 
-                frameborder="0" 
-                style="border:0;" 
-                allowfullscreen="" 
-                loading="lazy" 
-                src="https://maps.google.com/maps?q=Islamabad&t=&z=14&ie=UTF8&iwloc=&output=embed">
-              </iframe>
+              <div id="map" style="width: 100%; height: 100%;"></div>
             </div>
             <div id="immediate-threats-container" class="threats-list">
               <!-- Dynamically populated threats tags -->
@@ -1130,6 +1152,81 @@
       stopProgressTimer();
     }
 
+    // Coordinates mapping for Pakistani sectors
+    const locationCoordinates = {
+      'g-10': { lat: 33.6820, lng: 73.0130 },
+      'i-8': { lat: 33.6650, lng: 73.0760 },
+      'f-7': { lat: 33.7220, lng: 73.0560 },
+      'g-9': { lat: 33.6890, lng: 73.0300 },
+      'i-10': { lat: 33.6450, lng: 73.0250 },
+      'e-11': { lat: 33.7020, lng: 72.9780 },
+      'model town': { lat: 31.4800, lng: 74.3200 },
+      'gulberg': { lat: 31.5100, lng: 74.3500 },
+      'johar town': { lat: 31.4700, lng: 74.2700 }
+    };
+
+    let map = null;
+    let marker = null;
+
+    function initMap() {
+      if (map) return;
+      map = L.map('map', {
+        zoomControl: false,
+        attributionControl: false
+      }).setView([33.6844, 73.0479], 13);
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 20
+      }).addTo(map);
+
+      L.control.zoom({
+        position: 'bottomright'
+      }).addTo(map);
+    }
+
+    function updateMap(locationName) {
+      if (!map) initMap();
+      
+      const locLower = (locationName || '').toLowerCase();
+      let coords = { lat: 33.6844, lng: 73.0479 }; // Default Islamabad
+      let isLahore = locLower.includes('lahore') || locLower.includes('model') || locLower.includes('gulberg') || locLower.includes('johar');
+      
+      if (isLahore) {
+        coords = { lat: 31.5204, lng: 74.3587 }; // Default Lahore
+      }
+
+      for (const key in locationCoordinates) {
+        if (locLower.includes(key)) {
+          coords = locationCoordinates[key];
+          break;
+        }
+      }
+
+      setTimeout(() => {
+        map.invalidateSize();
+        map.setView([coords.lat, coords.lng], 14);
+
+        if (marker) {
+          marker.setLatLng([coords.lat, coords.lng]);
+        } else {
+          const redIcon = L.divIcon({
+            className: 'custom-div-icon',
+            html: `<div style="background-color: var(--red); width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 10px var(--red); transform: translate(-3px, -3px);"></div>`,
+            iconSize: [14, 14],
+            iconAnchor: [7, 7]
+          });
+          marker = L.marker([coords.lat, coords.lng], { icon: redIcon }).addTo(map);
+        }
+      }, 100);
+    }
+
+    // Toggle expanded trace reasoning
+    document.addEventListener('click', function(e) {
+      if (e.target && e.target.classList.contains('agent-desc')) {
+        e.target.classList.toggle('expanded');
+      }
+    });
+
     // Dynamic Color Assigner for Agents
     const AGENT_COLORS = {
       SignalNormalizerAgent: 'var(--blue)',
@@ -1159,10 +1256,7 @@
       document.getElementById('val-latency').innerText = `${((data.total_elapsed_ms || 2150) / 1000).toFixed(2)}s`;
 
       // Update Map embed dynamically based on location
-      const mapIframe = document.getElementById('map-iframe');
-      if (data.affected_area) {
-        mapIframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(data.affected_area + ', Islamabad')}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
-      }
+      updateMap(data.affected_area || type);
 
       // Threats List
       const threatsContainer = document.getElementById('immediate-threats-container');
