@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIRO Command Center — Crisis Intelligence & Response Orchestrator</title>
+  
+  <!-- Premium Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-color: #060608;
+      --panel-bg: #111116;
+      --card-bg: #161622;
+      --border-color: #242436;
+      --accent-color: #F59E0B;
+      --accent-glow: rgba(245, 158, 11, 0.2);
+      --text-primary: #FFFFFF;
+      --text-secondary: #9CA3AF;
+      --green: #10B981;
+      --red: #EF4444;
+      --blue: #3B82F6;
+      --purple: #8B5CF6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      font-family: 'Outfit', sans-serif;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-color);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-color);
+    }
+
+    header {
+      background-color: var(--panel-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      background: linear-gradient(135deg, var(--accent-color), #D97706);
+      color: #000;
+      font-weight: 800;
+      font-size: 1.2rem;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .header-logo h1 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .system-status {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .status-pill {
+      background-color: rgba(16, 185, 129, 0.1);
+      border: 1px solid var(--green);
+      color: var(--green);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-pill span {
+      width: 8px;
+      height: 8px;
+      background-color: var(--green);
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse 1.5s infinite;
+    }
+
+    .main-container {
+      max-width: 1400px;
+      margin: 32px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 32px;
+    }
+
+    @media (max-width: 1024px) {
+      .main-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .control-panel {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      height: fit-content;
+      position: sticky;
+      top: 100px;
+    }
+
+    .section-title {
+      font-size: 0.9rem;
+      color: var(--accent-color);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      background-color: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      padding: 12px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+      min-height: 120px;
+      transition: all 0.3s ease;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #EF4444, #DC2626);
+      color: #FFF;
+      border: none;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-demo {
+      background-color: transparent;
+      border: 1px solid var(--accent-color);
+      color: var(--accent-color);
+      margin-top: 12px;
+    }
+
+    .btn-demo:hover {
+      background-color: var(--accent-glow);
+      transform: translateY(-2px);
+    }
+
+    .display-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .placeholder-view {
+      background-color: var(--panel-bg);
+      border: 1px dashed var(--border-color);
+      border-radius: 12px;
+      padding: 60px 24px;
+      text-align: center;
+      color: var(--text-secondary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .placeholder-icon {
+      font-size: 3rem;
+      opacity: 0.5;
+    }
+
+    /* Loading Overlay */
+    .loading-overlay {
+      background-color: rgba(6, 6, 8, 0.95);
+      border: 1px solid var(--accent-color);
+      border-radius: 12px;
+      padding: 60px 24px;
+      text-align: center;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      box-shadow: 0 0 30px var(--accent-glow);
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(245, 158, 11, 0.1);
+      border-top: 3px solid var(--accent-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .loading-status-box {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px 24px;
+      min-width: 250px;
+    }
+
+    .loading-status-text {
+      color: var(--accent-color);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+    }
+
+    /* Result Components */
+    .result-section {
+      display: none;
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .metric-card {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background-color: var(--accent-color);
+    }
+
+    .metric-card.flood::before { background-color: var(--red); }
+    .metric-card.heatwave::before { background-color: var(--accent-color); }
+    .metric-card.accident::before { background-color: var(--blue); }
+    .metric-card.infrastructure::before { background-color: var(--purple); }
+
+    .metric-label {
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .metric-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .metric-sub {
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+
+    /* Two Column Layout for details */
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+
+    @media (max-width: 900px) {
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel-box {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    /* Timeline style */
+    .timeline {
+      border-left: 2px solid var(--border-color);
+      padding-left: 20px;
+      margin-left: 8px;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .timeline-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -26px;
+      top: 4px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: var(--accent-color);
+      border: 2px solid var(--bg-color);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .timeline-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px 16px;
+      border-left-width: 3px;
+    }
+
+    .agent-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .agent-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .agent-duration {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .agent-reasoning {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-style: italic;
+    }
+
+    /* Action Plan Grid */
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .action-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .action-card h4 {
+      font-size: 0.9rem;
+      color: var(--accent-color);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .action-list {
+      list-style-type: none;
+    }
+
+    .action-list li {
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      padding-left: 14px;
+      position: relative;
+    }
+
+    .action-list li::before {
+      content: '⚡';
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-size: 0.75rem;
+    }
+
+    .alert-msg {
+      background-color: rgba(245, 158, 11, 0.05);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      border-radius: 6px;
+      padding: 10px;
+      color: #FBBF24;
+      font-size: 0.85rem;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    /* Simulation Table */
+    .sim-banner {
+      background-color: var(--card-bg);
+      border: 1px solid var(--accent-color);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .sim-banner-icon {
+      font-size: 1.8rem;
+    }
+
+    .sim-banner-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .sim-banner-desc {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+
+    .comparison-table th {
+      text-align: left;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .comparison-table td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.9rem;
+    }
+
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .metric-tag {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .val-before {
+      color: var(--red);
+      font-weight: 600;
+    }
+
+    .val-after {
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    /* Animations */
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-logo">
+      <div class="logo-badge">🛡️</div>
+      <div>
+        <h1>CIRO COMMAND</h1>
+        <div style="font-size: 0.7rem; color: var(--accent-color); font-weight: 700; letter-spacing: 1px;">CRISIS INTELLIGENCE & RESPONSE ORCHESTRATOR</div>
+      </div>
+    </div>
+    
+    <div class="system-status">
+      <div class="status-pill">
+        <span></span> PIPELINE ACTIVE
+      </div>
+    </div>
+  </header>
+
+  <div class="main-container">
+    
+    <!-- LEFT PANEL: CONTROLS -->
+    <div class="control-panel">
+      <div class="section-title">📢 CRISIS INGESTION</div>
+      
+      <div class="form-group">
+        <label for="crisis-text">CRISIS REPORT INPUT</label>
+        <textarea id="crisis-text" placeholder="Enter emergency report in English, Roman Urdu, or Hinglish... e.g. G-10 mein bohot zyada paani khara ho gaya hai aur traffic block hai."></textarea>
+      </div>
+
+      <button id="btn-submit" class="btn-primary">
+        📊 ANALYZE CRISIS
+      </button>
+
+      <button id="btn-demo" class="btn-demo">
+        ⚡ RUN DEMO SCENARIO
+      </button>
+    </div>
+
+    <!-- RIGHT PANEL: DISPLAYS -->
+    <div class="display-panel">
+      
+      <!-- Initial Placeholder State -->
+      <div id="placeholder-view" class="placeholder-view">
+        <div class="placeholder-icon">📡</div>
+        <h3>No System Executions Active</h3>
+        <p style="font-size: 0.9rem; max-width: 450px; margin: 0 auto;">Input a crisis report or trigger the G-10 flood demo scenario to initiate the multi-agent AI pipeline.</p>
+      </div>
+
+      <!-- Loading State Overlay -->
+      <div id="loading-view" class="loading-overlay">
+        <div class="spinner"></div>
+        <h3 style="letter-spacing: 1px; font-weight: 800;">CIRO ORCHESTRATOR INVOLVED</h3>
+        <div class="loading-status-box">
+          <div id="loading-status-text" class="loading-status-text">Analyzing crisis signals...</div>
+        </div>
+      </div>
+
+      <!-- RESULTS SECTION -->
+      <div id="result-view" class="result-section">
+        
+        <!-- Metrics Grid -->
+        <div class="overview-grid">
+          <div id="card-type" class="metric-card">
+            <div class="metric-label">CRISIS TYPE</div>
+            <div id="val-type" class="metric-value">FLOOD</div>
+            <div id="val-area" class="metric-sub">📍 Islamabad G-10</div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-label">SEVERITY / IMPACT</div>
+            <div id="val-severity" class="metric-value">HIGH (8/10)</div>
+            <div id="val-population" class="metric-sub">👥 Affected Pop: 85,000</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-label">TOTAL ENGINE LATENCY</div>
+            <div id="val-latency" class="metric-value">2,450ms</div>
+            <div class="metric-sub">⚡ 5/5 Agents Synced</div>
+          </div>
+        </div>
+
+        <div class="details-grid">
+          <!-- Column 1: Agent Trace Timeline -->
+          <div class="panel-box">
+            <div class="section-title">⚙️ SYSTEM AGENT TRACES</div>
+            <div id="timeline-container" class="timeline">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Column 2: Action Plan & Response Coordinates -->
+          <div class="panel-box">
+            <div class="section-title">📋 COORDIANTED RESPONSE PLANS</div>
+            <div class="action-grid">
+              
+              <div class="action-card">
+                <h4>🔀 Traffic Rerouting</h4>
+                <ul id="plan-traffic" class="action-list">
+                  <!-- Dynamically populated -->
+                </ul>
+              </div>
+
+              <div class="action-card">
+                <h4>🚀 Active Emergency Units</h4>
+                <ul id="plan-dispatch" class="action-list">
+                  <!-- Dynamically populated -->
+                </ul>
+              </div>
+
+              <div class="action-card">
+                <h4>⚠️ Broadcast Emergency Alert</h4>
+                <div id="plan-alert" class="alert-msg">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+
+              <div class="action-card">
+                <h4>📦 Deployed Resource Inventory</h4>
+                <ul id="plan-resources" class="action-list">
+                  <!-- Dynamically populated -->
+                </ul>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Simulation Comparison Section -->
+        <div class="panel-box" style="margin-bottom: 32px;">
+          <div class="section-title">📊 IMPACT SIMULATION & MITIGATION METRICS</div>
+          
+          <div class="sim-banner">
+            <div class="sim-banner-icon">📈</div>
+            <div>
+              <div id="sim-id" class="sim-banner-title">SIM-2026-F08A</div>
+              <div id="sim-summary" class="sim-banner-desc">Response plan executed successfully. Road passability restored from 10% to 75%.</div>
+            </div>
+          </div>
+
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Impact Metric</th>
+                <th>Pre-Response (Before)</th>
+                <th>Post-Mitigation (After)</th>
+              </tr>
+            </thead>
+            <tbody id="sim-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = 'https://ciro-backend-658608522807.us-central1.run.app';
+
+    // UI Nodes
+    const btnSubmit = document.getElementById('btn-submit');
+    const btnDemo = document.getElementById('btn-demo');
+    const txtInput = document.getElementById('crisis-text');
+
+    const viewPlaceholder = document.getElementById('placeholder-view');
+    const viewLoading = document.getElementById('loading-view');
+    const viewResult = document.getElementById('result-view');
+    const txtStatus = document.getElementById('loading-status-text');
+
+    // Timer refs
+    let loadingInterval = null;
+
+    function startProgressTimer() {
+      let elapsed = 0;
+      txtStatus.innerText = "Analyzing crisis signals...";
+      
+      loadingInterval = setInterval(() => {
+        elapsed += 1;
+        if (elapsed < 5) {
+          txtStatus.innerText = "Analyzing crisis signals...";
+        } else if (elapsed < 15) {
+          txtStatus.innerText = "Running AI agents...";
+        } else if (elapsed < 30) {
+          txtStatus.innerText = "Generating response plan...";
+        } else {
+          txtStatus.innerText = "Finalizing simulation...";
+        }
+      }, 1000);
+    }
+
+    function stopProgressTimer() {
+      if (loadingInterval) {
+        clearInterval(loadingInterval);
+        loadingInterval = null;
+      }
+    }
+
+    function showLoading() {
+      viewPlaceholder.style.display = 'none';
+      viewResult.style.display = 'none';
+      viewLoading.style.display = 'flex';
+      btnSubmit.disabled = true;
+      btnDemo.disabled = true;
+      startProgressTimer();
+    }
+
+    function hideLoading() {
+      viewLoading.style.display = 'none';
+      btnSubmit.disabled = false;
+      btnDemo.disabled = false;
+      stopProgressTimer();
+    }
+
+    // Dynamic Color Assigner for Agents
+    const AGENT_COLORS = {
+      SignalNormalizerAgent: 'var(--blue)',
+      CrisisDetectorAgent: 'var(--accent-color)',
+      SituationAnalystAgent: 'var(--purple)',
+      ActionPlannerAgent: 'var(--green)',
+      SimulationAgent: 'var(--red)'
+    };
+
+    // Render results on UI
+    function renderResults(data) {
+      // 1. Basic properties
+      const type = data.crisis_type || 'unknown';
+      const severityStr = data.severity ? `${data.severity.toUpperCase()} (${data.severity_score || 5}/10)` : 'MEDIUM';
+      
+      document.getElementById('card-type').className = `metric-card ${type}`;
+      document.getElementById('val-type').innerText = type.toUpperCase();
+      document.getElementById('val-area').innerText = `📍 ${data.affected_area || 'Sector Area'}`;
+      document.getElementById('val-severity').innerText = severityStr;
+      document.getElementById('val-population').innerText = `👥 Affected Pop: ${(data.affected_population || 0).toLocaleString()}`;
+      document.getElementById('val-latency').innerText = `${(data.total_elapsed_ms || 2150).toLocaleString()}ms`;
+
+      // 2. Timeline
+      const timelineContainer = document.getElementById('timeline-container');
+      timelineContainer.innerHTML = '';
+      const traces = data.agent_traces || [];
+      traces.forEach(trace => {
+        const color = AGENT_COLORS[trace.agent] || 'var(--accent-color)';
+        const card = document.createElement('div');
+        card.className = 'timeline-item';
+        card.innerHTML = `
+          <div class="timeline-dot" style="background-color: ${color}"></div>
+          <div class="timeline-card" style="border-left-color: ${color}">
+            <div class="agent-header">
+              <span class="agent-name">${trace.agent}</span>
+              <span class="agent-duration" style="color: ${color}">${trace.duration_ms}ms</span>
+            </div>
+            <div class="agent-reasoning">"${trace.reasoning}"</div>
+          </div>
+        `;
+        timelineContainer.appendChild(card);
+      });
+
+      // 3. Action plans
+      const plan = data.action_plan || {};
+      
+      // Traffic plan
+      const trafficContainer = document.getElementById('plan-traffic');
+      trafficContainer.innerHTML = '';
+      const routes = plan.traffic_rerouting?.alternate_routes || [];
+      if (routes.length === 0) {
+        trafficContainer.innerHTML = `<li>No active rerouting coordinate shifts necessary.</li>`;
+      } else {
+        routes.forEach(r => {
+          const li = document.createElement('li');
+          li.innerText = r;
+          trafficContainer.appendChild(li);
+        });
+      }
+
+      // Deployed Units
+      const dispatchContainer = document.getElementById('plan-dispatch');
+      dispatchContainer.innerHTML = '';
+      const services = plan.emergency_dispatch?.services || [];
+      if (services.length === 0) {
+        dispatchContainer.innerHTML = `<li>No primary units active on standby.</li>`;
+      } else {
+        services.forEach(s => {
+          const li = document.createElement('li');
+          li.innerText = s;
+          dispatchContainer.appendChild(li);
+        });
+      }
+
+      // SMS Alert
+      const alertContainer = document.getElementById('plan-alert');
+      alertContainer.innerText = plan.public_alerts?.sms_message || 'No alerts broadcasts active.';
+
+      // Resources Deployed
+      const resourcesContainer = document.getElementById('plan-resources');
+      resourcesContainer.innerHTML = '';
+      const alloc = plan.resource_allocation || {};
+      let totalItems = 0;
+      Object.keys(alloc).forEach(key => {
+        if (Array.isArray(alloc[key])) {
+          alloc[key].forEach(item => {
+            const li = document.createElement('li');
+            li.innerText = `${key.replace(/_/g, ' ').toUpperCase()}: ${item}`;
+            resourcesContainer.appendChild(li);
+            totalItems++;
+          });
+        }
+      });
+      if (totalItems === 0) {
+        resourcesContainer.innerHTML = `<li>Resources held at local sector depots.</li>`;
+      }
+
+      // 4. Simulation Compare
+      const sim = data.simulation || {};
+      document.getElementById('sim-id').innerText = sim.simulation_id || 'SIM-PIPELINE';
+      document.getElementById('sim-summary').innerText = sim.improvement_summary || 'Response plans initiated.';
+
+      const before = sim.before_state || {};
+      const after = sim.after_state || {};
+      
+      const tbody = document.getElementById('sim-table-body');
+      tbody.innerHTML = '';
+
+      const addRow = (label, beforeVal, afterVal, isPct = false) => {
+        if (beforeVal === undefined && afterVal === undefined) return;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="metric-tag">${label}</td>
+          <td class="val-before">${beforeVal !== undefined ? beforeVal + (isPct ? '%' : '') : '—'}</td>
+          <td class="val-after">${afterVal !== undefined ? afterVal + (isPct ? '%' : '') : '—'}</td>
+        `;
+        tbody.appendChild(row);
+      };
+
+      // Add metrics depending on crisis type
+      if (type === 'flood') {
+        addRow('Road Passability', before.road_passability, after.road_passability, true);
+        const bW = before.flood_water_level_cm !== undefined ? `${before.flood_water_level_cm} cm` : before.water_level;
+        const aW = after.flood_water_level_cm !== undefined ? `${after.flood_water_level_cm} cm` : after.water_level;
+        addRow('Water Level', bW, aW);
+        addRow('Stranded People', before.stranded_people, after.stranded_people);
+        addRow('Trapped Vehicles', before.trapped_vehicles, after.trapped_vehicles);
+        addRow('Power Status', before.power_status, after.power_status);
+        addRow('Casualties Risk', before.casualties_risk, after.casualties_risk);
+      } else if (type === 'heatwave') {
+        addRow('Temperature', before.temperature, after.temperature);
+        addRow('Hospital Capacity', before.hospital_capacity, after.hospital_capacity);
+        addRow('Heat Stroke Cases', before.heat_stroke_cases, after.heat_stroke_cases);
+        const bCool = before.cooling_centers !== undefined ? before.cooling_centers : before.cooling_centers_active;
+        const aCool = after.cooling_centers !== undefined ? after.cooling_centers : after.cooling_centers_active;
+        addRow('Cooling Centers', bCool, aCool);
+        addRow('Casualties Risk', before.casualties_risk, after.casualties_risk);
+        addRow('Emergency Response', before.emergency_response_active ? 'Active' : 'Inactive', after.emergency_response_active ? 'Active' : 'Inactive');
+        addRow('Power Status', before.power_status, after.power_status);
+        addRow('Road Passability', before.road_passability, after.road_passability, true);
+      } else if (type === 'accident' || type === 'road_blockage') {
+        addRow('Congestion Level', before.congestion_level || before.congestion_pct, after.congestion_level || after.congestion_pct);
+        addRow('Blocked Roads', before.blocked_roads, after.blocked_roads);
+        addRow('Average Speed', before.avg_speed, after.avg_speed);
+        addRow('Casualties Risk', before.casualties_risk, after.casualties_risk);
+      } else {
+        // Fallback print all keys
+        const allKeys = new Set([...Object.keys(before), ...Object.keys(after)]);
+        allKeys.forEach(k => {
+          if (!['situation', 'emergency_response_active'].includes(k)) {
+            const formattedLabel = k.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            addRow(formattedLabel, before[k], after[k]);
+          }
+        });
+      }
+
+      viewResult.style.display = 'block';
+    }
+
+    // Trigger Ingest + Analyze flow
+    async function handleAnalyzeFlow() {
+      const textVal = txtInput.value.trim();
+      if (!textVal) {
+        alert('Please enter a crisis report to analyze.');
+        return;
+      }
+
+      showLoading();
+      try {
+        // 1. Ingest Signal
+        const ingestRes = await fetch(`${BACKEND_URL}/api/ingest`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: textVal })
+        });
+        
+        if (!ingestRes.ok) throw new Error('Failed to ingest crisis signal.');
+        const ingestData = await ingestRes.json();
+        
+        // 2. Full Analyze Pipeline
+        const analyzeRes = await fetch(`${BACKEND_URL}/api/analyze`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_id: ingestData.session_id })
+        });
+
+        if (!analyzeRes.ok) throw new Error('Failed to analyze crisis coordinates.');
+        const analyzeData = await analyzeRes.json();
+
+        // 3. Render Results
+        renderResults(analyzeData);
+
+      } catch (err) {
+        alert(`Operational Pipeline Failure: ${err.message}`);
+        viewPlaceholder.style.display = 'flex';
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Trigger Demo flow
+    async function handleDemoFlow() {
+      showLoading();
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/demo`);
+        if (!res.ok) throw new Error('Demo pipeline execution failed.');
+        const demoData = await res.json();
+        
+        renderResults(demoData);
+      } catch (err) {
+        alert(`Demo Activation Failure: ${err.message}`);
+        viewPlaceholder.style.display = 'flex';
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Event Bindings
+    btnSubmit.addEventListener('click', handleAnalyzeFlow);
+    btnDemo.addEventListener('click', handleDemoFlow);
+  </script>
+</body>
+</html>
