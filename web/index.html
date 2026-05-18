@@ -1238,6 +1238,9 @@
 
     // Render results on UI
     function renderResults(data) {
+      // Unhide the result view first so Leaflet can inspect map container dimensions
+      viewResult.style.display = 'block';
+
       const type = data.crisis_type || 'unknown';
       const severityStr = data.severity ? `${data.severity.toUpperCase()} (${data.severity_score || 5}/10)` : 'MEDIUM';
       
@@ -1481,7 +1484,6 @@
         });
       }
 
-      viewResult.style.display = 'block';
     }
 
     // Trigger Ingest + Analyze flow
