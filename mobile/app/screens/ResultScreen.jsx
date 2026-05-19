@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
-import MapView, { Marker, Polyline } from 'react-native-maps';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Dimensions, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppContext } from '../Context';
 
@@ -103,42 +102,6 @@ export default function ResultScreen({ navigation }) {
   };
 
   const coords = getCoords(displayArea);
-  const alternateRoutes = plan.traffic_rerouting?.alternate_routes || [];
-  
-  // Generate dummy polylines if routes exist
-  const routePolylines = alternateRoutes.length > 0 ? [
-    [
-      { latitude: coords.latitude, longitude: coords.longitude },
-      { latitude: coords.latitude + 0.005, longitude: coords.longitude + 0.005 },
-      { latitude: coords.latitude + 0.01, longitude: coords.longitude + 0.005 },
-    ],
-    [
-      { latitude: coords.latitude, longitude: coords.longitude },
-      { latitude: coords.latitude - 0.005, longitude: coords.longitude - 0.005 },
-      { latitude: coords.latitude - 0.01, longitude: coords.longitude - 0.01 },
-    ]
-  ] : [];
-
-  const darkMapStyle = [
-    { "elementType": "geometry", "stylers": [{ "color": "#242f3e" }] },
-    { "elementType": "labels.text.fill", "stylers": [{ "color": "#746855" }] },
-    { "elementType": "labels.text.stroke", "stylers": [{ "color": "#242f3e" }] },
-    { "featureType": "administrative.locality", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] },
-    { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] },
-    { "featureType": "poi.park", "elementType": "geometry", "stylers": [{ "color": "#263c3f" }] },
-    { "featureType": "poi.park", "elementType": "labels.text.fill", "stylers": [{ "color": "#6b9a76" }] },
-    { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#38414e" }] },
-    { "featureType": "road", "elementType": "geometry.stroke", "stylers": [{ "color": "#212a37" }] },
-    { "featureType": "road", "elementType": "labels.text.fill", "stylers": [{ "color": "#9ca5b3" }] },
-    { "featureType": "road.highway", "elementType": "geometry", "stylers": [{ "color": "#746855" }] },
-    { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [{ "color": "#1f2835" }] },
-    { "featureType": "road.highway", "elementType": "labels.text.fill", "stylers": [{ "color": "#f3d19c" }] },
-    { "featureType": "transit", "elementType": "geometry", "stylers": [{ "color": "#2f3948" }] },
-    { "featureType": "transit.station", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] },
-    { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#17263c" }] },
-    { "featureType": "water", "elementType": "labels.text.fill", "stylers": [{ "color": "#515c6d" }] },
-    { "featureType": "water", "elementType": "labels.text.stroke", "stylers": [{ "color": "#17263c" }] }
-  ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -213,36 +176,40 @@ export default function ResultScreen({ navigation }) {
         <View style={styles.mapSection}>
           <View style={styles.mapHeader}>
             <Text style={styles.mapTitle}>🗺️ Ground Operations Map</Text>
-            <View style={styles.openMapBtn}><Text style={styles.openMapText}>OPEN FULL GRID</Text></View>
           </View>
-          <View style={styles.mapContainer}>
-            <MapView
-              style={styles.map}
-              initialRegion={{
-                ...coords,
-                latitudeDelta: 0.02,
-                longitudeDelta: 0.02,
-              }}
-              provider="google"
-              customMapStyle={darkMapStyle}
-            >
-              <Marker
-                coordinate={coords}
-                title={displayCrisis}
-                description={displayArea}
-                pinColor="#EF4444"
-              />
-              {routePolylines.map((polyline, i) => (
-                <Polyline
-                  key={i}
-                  coordinates={polyline}
-                  strokeColor="#F59E0B"
-                  strokeWidth={3}
-                />
-              ))}
-            </MapView>
+          <TouchableOpacity 
+            style={styles.mapContainer} 
+            onPress={() => {
+              const url = `https://www.google.com/maps/search/?api=1&query=${coords.latitude},${coords.longitude}`;
+              Linking.openURL(url).catch((err) => console.error("Error opening map:", err));
+            }} 
+            activeOpacity={0.85}
+          >
+            <View style={styles.mapGridBackground}>
+              <View style={styles.radarCircle1} />
+              <View style={styles.radarCircle2} />
+              <View style={styles.radarLineH} />
+              <View style={styles.radarLineV} />
+            </View>
+            
+            <View style={styles.mapInfo}>
+              <View style={styles.locationHeader}>
+                <View style={styles.pulseDot} />
+                <Text style={styles.locationLabel}>ACTIVE SCANNED AREA</Text>
+              </View>
+              
+              <Text style={styles.mapLocationName}>{displayArea}</Text>
+              
+              <Text style={styles.coordinatesText}>
+                LAT: {coords.latitude.toFixed(4)}  |  LNG: {coords.longitude.toFixed(4)}
+              </Text>
+              
+              <View style={styles.viewButton}>
+                <Text style={styles.viewButtonText}>🗺️ VIEW ON GOOGLE MAPS</Text>
+              </View>
+            </View>
             <View style={styles.scanningBadge}><Text style={styles.scanningText}>🟢 ACTIVE AREA SCANNING</Text></View>
-          </View>
+          </TouchableOpacity>
         </View>
 
         <TouchableOpacity style={styles.viewSimButton} onPress={() => navigation.navigate('Simulation')}>
@@ -285,13 +252,23 @@ const styles = StyleSheet.create({
   etaBadge: { backgroundColor: '#064E3B', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, alignSelf: 'flex-start', marginTop: 8 },
   etaText: { color: '#34D399', fontSize: 10, fontWeight: 'bold' },
   mapSection: { backgroundColor: '#1A1A1A', padding: 16, borderRadius: 8, borderWidth: 1, borderColor: '#2A2A2A', marginBottom: 24 },
-  mapHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  mapHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   mapTitle: { color: '#FFF', fontSize: 16, fontWeight: 'bold' },
-  openMapBtn: { backgroundColor: '#F59E0B', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 4 },
-  openMapText: { color: '#0A0A0A', fontSize: 10, fontWeight: 'bold' },
-  mapContainer: { height: 250, borderRadius: 8, overflow: 'hidden' },
-  map: { ...StyleSheet.absoluteFillObject },
-  scanningBadge: { position: 'absolute', bottom: 8, left: 8, backgroundColor: '#141414', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4, borderWidth: 1, borderColor: '#2A2A2A' },
+  mapContainer: { height: 220, borderRadius: 4, overflow: 'hidden', borderWidth: 1, borderColor: '#2A2A2A', backgroundColor: '#141414', position: 'relative', justifyContent: 'center', padding: 20 },
+  mapGridBackground: { ...StyleSheet.absoluteFillObject, opacity: 0.15, justifyContent: 'center', alignItems: 'center' },
+  radarCircle1: { width: 280, height: 280, borderRadius: 140, borderWidth: 1, borderColor: '#F59E0B', position: 'absolute' },
+  radarCircle2: { width: 160, height: 160, borderRadius: 80, borderWidth: 1, borderColor: '#F59E0B', position: 'absolute' },
+  radarLineH: { width: '100%', height: 1, backgroundColor: '#F59E0B', position: 'absolute' },
+  radarLineV: { height: '100%', width: 1, backgroundColor: '#F59E0B', position: 'absolute' },
+  mapInfo: { zIndex: 5 },
+  locationHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  pulseDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#EF4444', marginRight: 8 },
+  locationLabel: { color: '#EF4444', fontSize: 10, fontWeight: 'bold', letterSpacing: 1 },
+  mapLocationName: { color: '#FFF', fontSize: 18, fontWeight: 'bold', marginBottom: 6 },
+  coordinatesText: { color: '#9CA3AF', fontSize: 12, marginBottom: 16 },
+  viewButton: { backgroundColor: '#F59E0B', paddingVertical: 10, paddingHorizontal: 16, borderRadius: 4, alignSelf: 'flex-start' },
+  viewButtonText: { color: '#0A0A0A', fontSize: 12, fontWeight: 'bold' },
+  scanningBadge: { position: 'absolute', bottom: 8, right: 8, backgroundColor: '#141414', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4, borderWidth: 1, borderColor: '#2A2A2A', zIndex: 10 },
   scanningText: { color: '#9CA3AF', fontSize: 10 },
   viewSimButton: { backgroundColor: '#F59E0B', padding: 16, borderRadius: 8, alignItems: 'center', marginBottom: 32 },
   viewSimButtonText: { color: '#FFF', fontWeight: 'bold' }
