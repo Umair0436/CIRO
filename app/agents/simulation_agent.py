@@ -24,21 +24,19 @@ Return ONLY valid JSON:
     "situation": "<description of situation BEFORE response>",
     "casualties_risk": "high" | "medium" | "low",
     "road_passability": <0-100 integer>,
-    "flood_water_level_cm": <integer or null>,
-    "trapped_vehicles": <integer>,
-    "stranded_people": <integer>,
-    "power_status": "normal" | "partial_outage" | "full_outage",
-    "emergency_response_active": false
+    "emergency_response_active": false,
+    "<dynamic_metric_1>": "<value>",
+    "<dynamic_metric_2>": "<value>",
+    "<dynamic_metric_3>": "<value>"
   },
   "after_state": {
     "situation": "<description AFTER full response>",
     "casualties_risk": "low",
     "road_passability": <0-100 higher than before>,
-    "flood_water_level_cm": <lower or null>,
-    "trapped_vehicles": 0,
-    "stranded_people": 0,
-    "power_status": "normal",
-    "emergency_response_active": true
+    "emergency_response_active": true,
+    "<dynamic_metric_1>": "<value>",
+    "<dynamic_metric_2>": "<value>",
+    "<dynamic_metric_3>": "<value>"
   },
   "improvement_summary": "<1-2 sentence summary of improvements achieved>",
   "mock_tickets": [
@@ -82,6 +80,7 @@ Return ONLY valid JSON:
 
 Generate 3-5 mock_tickets, 3-4 alert_dispatch_log entries, 2-3 route_updates.
 Make ticket IDs like TKT-2024-XXXX. Use realistic Pakistani emergency context.
+Ensure all metrics are highly realistic and matches severity (e.g. estimated_lives_protected must be between 50 and 2,500 depending on crisis severity, and should never exceed 10,000).
 """
 
 
@@ -120,6 +119,12 @@ SEVERITY: {situation.get('severity', 'medium')}
 AFFECTED AREA: {detection.get('affected_area', 'G-10')}
 AFFECTED POPULATION: {detection.get('affected_population', 0)}
 
+Based on the crisis type, include the following dynamic metrics in before_state and after_state:
+- For flood: water_level, trapped_vehicles, stranded_people, power_status, road_passability
+- For heatwave: temperature, hospital_capacity, heat_stroke_cases, cooling_centers, casualties_risk, emergency_response_active, power_status, road_passability
+- For accident or road_blockage: congestion_level, blocked_roads, avg_speed, casualties_risk
+- For infrastructure_failure: power_status, affected_sectors, repair_eta, backup_systems
+
 SITUATION BEFORE RESPONSE:
 {situation.get('crisis_summary', 'Crisis in progress.')}
 
@@ -142,14 +147,22 @@ Simulate realistic execution outcomes, tickets, alert logs, and route updates.""
         # Guarantee before/after structure exists
         parsed.setdefault("before_state", {
             "situation": "Crisis active — roads flooded, people stranded.",
-            "casualties_risk": "high",
+            "casualties_risk": "High",
             "road_passability": 10,
+            "flood_water_level_cm": 120,
+            "stranded_people": 45,
+            "trapped_vehicles": 15,
+            "power_status": "Outage",
             "emergency_response_active": False,
         })
         parsed.setdefault("after_state", {
             "situation": "Response deployed — roads clearing, people evacuated.",
-            "casualties_risk": "low",
+            "casualties_risk": "Low",
             "road_passability": 75,
+            "flood_water_level_cm": 15,
+            "stranded_people": 0,
+            "trapped_vehicles": 2,
+            "power_status": "Restored",
             "emergency_response_active": True,
         })
         parsed.setdefault("mock_tickets",       [])

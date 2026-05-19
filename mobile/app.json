@@ -10,10 +10,23 @@
     ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.ciro.crisisorchestrator"
+      "bundleIdentifier": "com.ciro.crisisorchestrator",
+      "config": {
+        "googleMapsApiKey": "AIzaSyCS320e63D3cJh4tS-khQVr4-BbSuuopJo"
+      }
     },
     "android": {
-      "package": "com.ciro.crisisorchestrator"
+      "package": "com.ciro.crisisorchestrator",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCS320e63D3cJh4tS-khQVr4-BbSuuopJo"
+        }
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "81ef4e6a-c613-48da-8ae2-739001becef2"
+      }
     }
   }
 }

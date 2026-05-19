@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'http://192.168.1.7:8000',
-  timeout: 60000,
+  baseURL: 'https://ciro-backend-658608522807.us-central1.run.app',
+  timeout: 120000,
 });
 
 export const runDemo = async () => {
@@ -17,6 +17,11 @@ export const ingestCrisis = async (text) => {
 
 export const analyzeCrisis = async (sessionId) => {
   const response = await apiClient.post('/api/analyze', { session_id: sessionId });
+  return response.data;
+};
+
+export const fetchLogs = async () => {
+  const response = await apiClient.get('/api/logs');
   return response.data;
 };
 
