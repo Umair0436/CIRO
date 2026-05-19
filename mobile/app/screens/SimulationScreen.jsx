@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, ScrollView, StyleSheet, Animated } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Animated, Linking, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { WebView } from 'react-native-webview';
 import { AppContext } from '../Context';
 
 const formatLivesProtected = (value) => {
@@ -22,6 +21,19 @@ export default function SimulationScreen() {
   const locationName = analysisData?.affected_area || 'ISLAMABAD SECTOR';
   const simData = analysisData?.simulation || {};
 
+  const [pulse] = useState(new Animated.Value(1));
+
+  useEffect(() => {
+    const pulseAnim = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, { toValue: 0.3, duration: 800, useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 1, duration: 800, useNativeDriver: true }),
+      ])
+    );
+    pulseAnim.start();
+    return () => pulseAnim.stop();
+  }, []);
+
   const getCoordinates = (location) => {
     const loc = location ? String(location).toLowerCase() : '';
     if (loc.includes('lahore')) {
@@ -34,75 +46,6 @@ export default function SimulationScreen() {
   };
 
   const { lat, lng } = getCoordinates(locationName);
-
-  const mapHtml = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-      <style>
-        html, body {
-          height: 100%;
-          margin: 0;
-          padding: 0;
-          background-color: #0A0A0A;
-        }
-        #map {
-          height: 100%;
-          width: 100%;
-        }
-        .pulse-marker {
-          background: #ef4444;
-          border-radius: 50%;
-          box-shadow: 0 0 0 0 rgba(239, 68, 68, 1);
-          margin: 10px;
-          height: 12px;
-          width: 12px;
-          animation: pulse 1.6s infinite;
-        }
-        @keyframes pulse {
-          0% {
-            transform: scale(0.95);
-            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-          }
-          70% {
-            transform: scale(1);
-            box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
-          }
-          100% {
-            transform: scale(0.95);
-            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-          }
-        }
-      </style>
-    </head>
-    <body>
-      <div id="map"></div>
-      <script>
-        var map = L.map('map', {
-          zoomControl: false,
-          attributionControl: false
-        }).setView([${lat}, ${lng}], 13);
-        
-        L.tileLayer('https://cartodb-basemaps-a.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
-          maxZoom: 19
-        }).addTo(map);
-
-        var pulseIcon = L.divIcon({
-          className: 'pulse-icon-container',
-          html: '<div class="pulse-marker"></div>',
-          iconSize: [32, 32],
-          iconAnchor: [16, 16]
-        });
-
-        L.marker([${lat}, ${lng}], { icon: pulseIcon }).addTo(map);
-      </script>
-    </body>
-    </html>
-  `;
   const simId = simData.simulation_id || 'SIM-20260517';
   const improvementSummary = simData.improvement_summary || 'Response deployed successfully.';
   const metrics = simData.metrics;
@@ -287,15 +230,38 @@ export default function SimulationScreen() {
           ))}
           
           <Text style={styles.mapTitle}>GROUND OPERATIONS MAP</Text>
-          <View style={styles.mapContainer}>
-            <WebView
-              originWhitelist={['*']}
-              source={{ html: mapHtml }}
-              style={styles.mapWebView}
-              javaScriptEnabled={true}
-              domStorageEnabled={true}
-            />
-          </View>
+          <TouchableOpacity 
+            style={styles.mapContainer} 
+            onPress={() => {
+              const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+              Linking.openURL(url).catch((err) => console.error("Error opening map:", err));
+            }} 
+            activeOpacity={0.85}
+          >
+            <View style={styles.mapGridBackground}>
+              <View style={styles.radarCircle1} />
+              <View style={styles.radarCircle2} />
+              <View style={styles.radarLineH} />
+              <View style={styles.radarLineV} />
+            </View>
+            
+            <View style={styles.mapInfo}>
+              <View style={styles.locationHeader}>
+                <Animated.View style={[styles.pulseDot, { opacity: pulse }]} />
+                <Text style={styles.locationLabel}>ACTIVE CRISIS ZONE</Text>
+              </View>
+              
+              <Text style={styles.mapLocationName}>{locationName}</Text>
+              
+              <Text style={styles.coordinatesText}>
+                LAT: {lat.toFixed(4)}  |  LNG: {lng.toFixed(4)}
+              </Text>
+              
+              <View style={styles.viewButton}>
+                <Text style={styles.viewButtonText}>🗺️ VIEW ON MAP</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
         </View>
 
       </ScrollView>
@@ -350,6 +316,18 @@ const styles = StyleSheet.create({
   routeName: { color: '#FFF', fontSize: 14, marginBottom: 4 },
   routeDetail: { color: '#9CA3AF', fontSize: 12 },
   mapTitle: { color: '#F59E0B', fontSize: 10, fontWeight: 'bold', marginTop: 16, marginBottom: 8 },
-  mapContainer: { height: 200, borderRadius: 4, overflow: 'hidden', borderWidth: 1, borderColor: '#2A2A2A', marginTop: 8 },
-  mapWebView: { flex: 1, backgroundColor: '#0A0A0A' }
+  mapContainer: { height: 200, borderRadius: 4, overflow: 'hidden', borderWidth: 1, borderColor: '#2A2A2A', marginTop: 8, backgroundColor: '#141414', position: 'relative', justifyContent: 'center', padding: 20 },
+  mapGridBackground: { ...StyleSheet.absoluteFillObject, opacity: 0.15, justifyContent: 'center', alignItems: 'center' },
+  radarCircle1: { width: 280, height: 280, borderRadius: 140, borderWidth: 1, borderColor: '#F59E0B', position: 'absolute' },
+  radarCircle2: { width: 160, height: 160, borderRadius: 80, borderWidth: 1, borderColor: '#F59E0B', position: 'absolute' },
+  radarLineH: { width: '100%', height: 1, backgroundColor: '#F59E0B', position: 'absolute' },
+  radarLineV: { height: '100%', width: 1, backgroundColor: '#F59E0B', position: 'absolute' },
+  mapInfo: { zIndex: 5 },
+  locationHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  pulseDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#EF4444', marginRight: 8 },
+  locationLabel: { color: '#EF4444', fontSize: 10, fontWeight: 'bold', letterSpacing: 1 },
+  mapLocationName: { color: '#FFF', fontSize: 18, fontWeight: 'bold', marginBottom: 6 },
+  coordinatesText: { color: '#9CA3AF', fontSize: 12, marginBottom: 16 },
+  viewButton: { backgroundColor: '#F59E0B', paddingVertical: 10, paddingHorizontal: 16, borderRadius: 4, alignSelf: 'flex-start' },
+  viewButtonText: { color: '#0A0A0A', fontSize: 12, fontWeight: 'bold' }
 });
