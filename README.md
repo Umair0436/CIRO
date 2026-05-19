@@ -19,7 +19,7 @@ CIRO is a **5-agent AI orchestration system** that:
 ## 🚀 Live Deployment
 - **Backend API**: https://ciro-backend-658608522807.us-central1.run.app
 - **API Docs**: https://ciro-backend-658608522807.us-central1.run.app/docs  
-- **Web Dashboard**: https://umair0436.github.io/CIRO/web/
+- **Web Dashboard**: https://ciroproject.netlify.app/
 - **Mobile App**: APK link coming soon
 
 ---
